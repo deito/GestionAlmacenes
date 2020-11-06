@@ -13,7 +13,7 @@ usuarioService.save = async (req, res) => {
             mensaje: "Error inesperado al guardar usuario."
         };
         if(usuarioModelRes){
-            response.mensaje = 1;
+            response.resultado = 1;
             response.mensaje = "";
             response.id_usuario = usuarioModelRes[0].id_usuario;
         } else {
