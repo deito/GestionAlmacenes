@@ -37,7 +37,7 @@ usuarioService.login = async (req, res) => {
         if(usuarioModelRes && usuarioModelRes.length > 0){
             const token = crypto.randomBytes(16).toString('hex');
             console.log("token:", token);
-            response.mensaje = 1;
+            response.resultado = 1;
             response.mensaje = "";
             response.token = token;
             response.usuario = usuarioModelRes[0];
