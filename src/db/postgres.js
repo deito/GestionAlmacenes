@@ -1,16 +1,16 @@
 const config = require('../config');
 const { Pool } = require('pg');
-/*
+
 const types = require('pg').types;
 
 types.setTypeParser(1114, function(stringValue) {
 
   var temp = new Date(stringValue);
   return new Date(Date.UTC(
-      temp.getFullYear(), temp.getMonth(), temp.getHours(), temp.getMinutes(), temp.getSeconds(), temp.getMilliseconds())
+      temp.getFullYear(), temp.getMonth(), temp.getDate(),temp.getHours(), temp.getMinutes(), temp.getSeconds(), temp.getMilliseconds())
   );
 });
-*/
+
 
 const pool = new Pool({
     user: config.postgres.user,
