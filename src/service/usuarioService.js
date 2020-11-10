@@ -6,6 +6,18 @@ const crypto = require('crypto');
 usuarioService.save = async (req, res) => {
     try {
         req.body.fecha_registro = new Date();
+        console.log("req.body.usuario:", req.body.usuario);
+        const usuarioBuscado = await usuarioModel.getByUsuario(postgresConn, req.body.usuario);
+        if(usuarioBuscado && usuarioBuscado.length > 0){
+            console.log("usuarioBuscado[0].usuario:", usuarioBuscado[0].usuario);
+            const errorRes  = {
+                resultado: 0,
+                mensaje: "El usuario "+usuarioBuscado[0].usuario+" ya existe. Por favor elije otro nombre de usuario."
+            };
+            res.status(200).json(errorRes);
+            return;
+        }
+
         console.log("req.body.fecha_registro:", req.body.fecha_registro);
         const usuarioModelRes = await usuarioModel.save(postgresConn, req);
         const response = {

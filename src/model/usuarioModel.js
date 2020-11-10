@@ -1,3 +1,4 @@
+const RolBean = require('../bean/rolBean');
 const usuarioModel = {};
 
 usuarioModel.save = async (conn, req) => {
@@ -67,18 +68,25 @@ usuarioModel.login = async (conn, req) => {
     //console.log("queryResponse:",queryResponse);
     const response = [];
     for(let i = 0;i < queryResponse.rows.length;i++){
-        response.push(extractFromResponse(queryResponse.rows[i]));
+        response.push(extractUsuarioFromResponse(queryResponse.rows[i]));
     }
     //console.log("usuarioModel.login response: ",response);
     return response;
 };
 
-function extractFromResponse(aRow){
+usuarioModel.getByUsuario = async (conn, usuarioParam) => {
+    const queryResponse = await conn.query("SELECT * FROM rrn.tusuario WHERE usuario=$1",[usuarioParam]);
+    return queryResponse.rows;
+};
+
+function extractUsuarioFromResponse(aRow){
+    /*
     const rol = {
         id_rol: aRow.id_rol,
         descripcion: aRow.descripcion,
         estado: aRow.rol_estado
-    };
+    };*/
+    const rol = new RolBean(aRow.id_rol, aRow.descripcion, aRow.rol_estado);
     const usuario = {
         id_usuario: aRow.id_usuario,
         id_local: aRow.id_local,
