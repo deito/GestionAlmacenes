@@ -1,4 +1,5 @@
 const RolBean = require('../bean/rolBean');
+const UsuarioBean = require('../bean/usuarioBean');
 const usuarioModel = {};
 
 usuarioModel.save = async (conn, req) => {
@@ -62,7 +63,7 @@ usuarioModel.save = async (conn, req) => {
 
 usuarioModel.login = async (conn, req) => {
     const { usuario, contrasena } = { ...req.body };
-    const queryResponse = await conn.query("SELECT usu.*, rol.descripcion as descripcion, rol.estado rol_estado FROM rrn.tusuario usu join rrn.trol rol on rol.id_rol = usu.id_rol where usu.usuario=$1 and usu.contrasena is not null and usu.contrasena=crypt($2,usu.contrasena)",
+    const queryResponse = await conn.query("SELECT usu.*, rol.descripcion as rol_descripcion, rol.estado rol_estado FROM rrn.tusuario usu join rrn.trol rol on rol.id_rol = usu.id_rol where usu.usuario=$1 and usu.contrasena is not null and usu.contrasena=crypt($2,usu.contrasena)",
         [usuario, contrasena]
     );
     //console.log("queryResponse:",queryResponse);
@@ -86,7 +87,11 @@ function extractUsuarioFromResponse(aRow){
         descripcion: aRow.descripcion,
         estado: aRow.rol_estado
     };*/
-    const rol = new RolBean(aRow.id_rol, aRow.descripcion, aRow.rol_estado);
+    const rol_descripcion = aRow.rol_descripcion ? aRow.rol_descripcion : null;
+    const rol_estado = aRow.rol_estado ? aRow.rol_estado : null;
+    const id_rol = aRow.id_rol ? aRow.id_rol : null;
+    const rol = new RolBean(id_rol, rol_descripcion, rol_estado);
+    /*
     const usuario = {
         id_usuario: aRow.id_usuario,
         id_local: aRow.id_local,
@@ -103,8 +108,24 @@ function extractUsuarioFromResponse(aRow){
         fecha_registro: aRow.fecha_registro,
         modificado_por: aRow.modificado_por,
         fecha_modificacion: aRow.fecha_modificacion
-    };
-    return usuario;
+    };*/
+    const id_usuario = aRow.id_usuario ? aRow.id_usuario : null;
+    const id_local = aRow.id_local ? aRow.id_local : null;
+    const nombres = aRow.nombres ? aRow.nombres : null;
+    const apellidos = aRow.apellidos ? aRow.apellidos : null;
+    const usuario = aRow.usuario ? aRow.usuario : null;
+    const contrasena = null;
+    const tipo_documento = aRow.tipo_documento ? aRow.tipo_documento : null;
+    const numero_documento = aRow.numero_documento ? aRow.numero_documento : null;
+    const telefono = aRow.telefono ? aRow.telefono : null;
+    const estado = aRow.estado ? aRow.estado : null;
+    const registrado_por = aRow.registrado_por ? aRow.registrado_por : null;
+    const fecha_registro = aRow.fecha_registro ? aRow.fecha_registro : null;
+    const modificado_por = aRow.modificado_por ? aRow.modificado_por : null;
+    const fecha_modificacion = aRow.fecha_modificacion ? aRow.fecha_modificacion : null;
+    const usuarioBean = new UsuarioBean(id_usuario, id_local, nombres, apellidos, usuario, contrasena, rol, tipo_documento, 
+        numero_documento, telefono, estado, registrado_por, fecha_registro, modificado_por, fecha_modificacion);
+    return usuarioBean;
 }
 
 module.exports = usuarioModel;
