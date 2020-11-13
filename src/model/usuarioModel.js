@@ -3,7 +3,7 @@ const UsuarioBean = require('../bean/usuarioBean');
 const usuarioModel = {};
 
 usuarioModel.save = async (conn, req) => {
-    let { id_local, nombres, apellidos, usuario, contrasena, id_rol, tipo_documento, numero_documento, telefono, estado, registrado_por, fecha_registro } = { ...req.body };
+    let { id_local, nombres, apellidos, usuario, contrasena, id_rol, tipo_documento, numero_documento, telefono, estado, registrado_por, fecha_registro } = req.body;
     console.log("id_local: "+id_local);
     if(!id_local){
         id_local = null;

@@ -13,6 +13,7 @@ app.use(express.urlencoded({extended: false}));
 
 // Routes
 app.use('/usuario',require('./route/usuarioRouter'));
+app.use('/local', require('./route/localRouter'));
 
 // Export the app instance
 module.exports = app;

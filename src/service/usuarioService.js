@@ -27,7 +27,7 @@ usuarioService.save = async (req, res) => {
 
         const usuarioModelRes = await usuarioModel.save(postgresConn, req);
         
-        if(usuarioModelRes){
+        if(usuarioModelRes && usuarioModelRes[0].id_usuario && usuarioModelRes[0].id_usuario != 0){
             response.resultado = 1;
             response.mensaje = "";
             response.id_usuario = usuarioModelRes[0].id_usuario;
@@ -87,7 +87,7 @@ usuarioService.login = async (req, res) => {
                 const responseSesionModel = await sesionModel.save(postgresConn, sesionBean);
                 
                 if(responseSesionModel && responseSesionModel[0].fecha_expiracion){
-                    console.log("responseSesionModel.rows[0].fecha_expiracion:", responseSesionModel[0].fecha_expiracion);
+                    console.log("responseSesionModel[0].fecha_expiracion:", responseSesionModel[0].fecha_expiracion);
                     response.resultado = 1;
                     response.mensaje = "";
                     response.token = nuevoToken;
