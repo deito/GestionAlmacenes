@@ -1,4 +1,7 @@
 const SesionBean = require('../bean/sesionBean');
+const LocalBean = require('../bean/localBean');
+const RolBean = require('../bean/rolBean');
+const UsuarioBean = require('../bean/usuarioBean');
 const utility = require('../util/utility');
 const usuarioModel = require('../model/usuarioModel');
 const sesionModel = require('../model/sesionModel');
@@ -25,7 +28,62 @@ usuarioService.save = async (req, res) => {
             return;
         }
 
-        const usuarioModelRes = await usuarioModel.save(postgresConn, req);
+        let { id_local, nombres, apellidos, usuario, contrasena, id_rol, tipo_documento, numero_documento, telefono, estado, registrado_por, fecha_registro } = req.body;
+        console.log("id_local: "+id_local);
+        if(!id_local){
+            id_local = null;
+        }
+        console.log("nombres: "+nombres);
+        if(!nombres){
+            nombres = null;
+        }
+        console.log("apellidos: "+apellidos);
+        if(!apellidos){
+            apellidos = null;
+        }
+        console.log("usuario: "+usuario);
+        if(!usuario){
+            usuario = null;
+        }
+        console.log("contrasena: "+contrasena);
+        if(!contrasena){
+            contrasena = null;
+        }
+        console.log("id_rol: "+id_rol);
+        if(!id_rol){
+            id_rol = null;
+        }
+        console.log("tipo_documento: "+tipo_documento);
+        if(!tipo_documento){
+            tipo_documento = null;
+        }
+        console.log("numero_documento: "+numero_documento);
+        if(!numero_documento){
+            numero_documento = null;
+        }
+        console.log("telefono: "+telefono);
+        if(!telefono){
+            telefono = null;
+        }
+        console.log("estado: "+estado);
+        if(!estado){
+            estado = null;
+        }
+        console.log("registrado_por: "+registrado_por);
+        if(!registrado_por){
+            registrado_por = null;
+        }
+        console.log("fecha_registro: "+fecha_registro);
+        if(!fecha_registro){
+            fecha_registro = null;
+        }
+
+        const localBean = new LocalBean(id_local, null, null, null, null, null, null, null, null, null);
+        const rolBean = new RolBean(id_rol, null, null);
+        const usuarioBean = new UsuarioBean(null, localBean, nombres, apellidos, usuario, contrasena, rolBean, tipo_documento,
+            numero_documento, telefono, estado, registrado_por, fecha_registro, null, null);
+
+        const usuarioModelRes = await usuarioModel.save(postgresConn, usuarioBean);
         
         if(usuarioModelRes && usuarioModelRes[0].id_usuario && usuarioModelRes[0].id_usuario != 0){
             response.resultado = 1;

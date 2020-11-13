@@ -1,8 +1,8 @@
 module.exports = class UsuarioBean {
-    constructor(id_usuario, id_local, nombres, apellidos, usuario, contrasena, rol, tipo_documento, numero_documento, telefono, estado,
+    constructor(id_usuario, local, nombres, apellidos, usuario, contrasena, rol, tipo_documento, numero_documento, telefono, estado,
         registrado_por, fecha_registro, modificado_por, fecha_modificacion){
         this.id_usuario = id_usuario;
-        this.id_local = id_local;
+        this.local = local;
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.usuario = usuario;
