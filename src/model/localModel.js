@@ -1,5 +1,5 @@
 const LocalBean = require('../bean/localBean');
-const localBean = require('../bean/localBean');
+
 const localModel = {};
 
 localModel.save = async (conn, localBean) => {
@@ -27,12 +27,12 @@ localModel.getAll = async (conn) => {
     const queryResponse = await conn.query("SELECT local.* FROM rrn.tlocal local",[]);
     const response = [];
     for(let i=0;i < queryResponse.rows.length;i++){
-        response.push(extractRolFromResponse(queryResponse.rows[i]));
+        response.push(extractLocalFromResponse(queryResponse.rows[i]));
     }
     return response;
 };
 
-function extractRolFromResponse(aRow){
+function extractLocalFromResponse(aRow){
     const id_local = aRow.id_local ? aRow.id_local : null;
     const codigo = aRow.codigo ? aRow.codigo : null;
     const nombre = aRow.nombre ? aRow.nombre : null;
