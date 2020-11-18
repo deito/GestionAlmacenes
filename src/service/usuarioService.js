@@ -167,4 +167,23 @@ usuarioService.login = async (req, res) => {
     }
 };
 
+usuarioService.getAll = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al obtener usuarios."
+        };
+        const usuarioModelRes = await usuarioModel.getAll(postgresConn);
+        if(usuarioModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista_usuarios = usuarioModelRes;
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en usuarioService.getAll,', error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = usuarioService;

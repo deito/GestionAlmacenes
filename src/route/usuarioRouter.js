@@ -9,4 +9,7 @@ router.post('/save', usuarioService.save);
 // Login
 router.post('/login', usuarioService.login);
 
+// obtener todos los usuarios
+router.get('/getAll', usuarioService.getAll);
+
 module.exports = router;
