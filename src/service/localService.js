@@ -101,4 +101,23 @@ localService.updateById = async (req, res) => {
     
 };
 
+localService.getAll = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al obtener locales."
+        };
+        const localModelRes = await localModel.getAll(postgresConn);
+        if(localModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista_locales = localModelRes;
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en localService.getAll,', error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = localService;

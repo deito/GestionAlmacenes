@@ -1,3 +1,5 @@
+const LocalBean = require('../bean/localBean');
+const localBean = require('../bean/localBean');
 const localModel = {};
 
 localModel.save = async (conn, localBean) => {
@@ -20,5 +22,30 @@ localModel.updateById = async (conn, localBean) => {
     }
     return false;
 };
+
+localModel.getAll = async (conn) => {
+    const queryResponse = await conn.query("SELECT local.* FROM rrn.tlocal local",[]);
+    const response = [];
+    for(let i=0;i < queryResponse.rows.length;i++){
+        response.push(extractRolFromResponse(queryResponse.rows[i]));
+    }
+    return response;
+};
+
+function extractRolFromResponse(aRow){
+    const id_local = aRow.id_local ? aRow.id_local : null;
+    const codigo = aRow.codigo ? aRow.codigo : null;
+    const nombre = aRow.nombre ? aRow.nombre : null;
+    const telefono = aRow.telefono ? aRow.telefono : null;
+    const direccion = aRow.direccion ? aRow.direccion : null;
+    const estado = aRow.estado ? aRow.estado : null;
+    const registrado_por = aRow.registrado_por ? aRow.registrado_por : null;
+    const fecha_registro = aRow.fecha_registro ? aRow.fecha_registro : null;
+    const modificado_por = aRow.modificado_por ? aRow.modificado_por : null;
+    const fecha_modificacion = aRow.fecha_modificacion ? aRow.fecha_modificacion : null;
+    const localBean = new LocalBean(id_local, codigo, nombre, telefono, direccion, estado,
+        registrado_por, fecha_registro, modificado_por, fecha_modificacion);
+    return localBean;
+}
 
 module.exports = localModel;
