@@ -73,7 +73,7 @@ usuarioModel.updateById = async (conn, usuarioBean) => {
     return false;
 };
 
-usuarioModel.getByUsuarioAndIdRol = async (conn, usuarioBean) => {    
+usuarioModel.searchByUsuarioAndIdRol = async (conn, usuarioBean) => {    
     let queryFinal = "SELECT usu.* FROM rrn.tusuario usu";
     let amountOfParameters = 1;
     let whereCondition = "";
@@ -81,7 +81,7 @@ usuarioModel.getByUsuarioAndIdRol = async (conn, usuarioBean) => {
     if(usuarioBean.usuario){        
         amountOfParameters = amountOfParameters +1;
     }
-    if(usuarioBean.id_rol){
+    if(usuarioBean.rol.id_rol){
         amountOfParameters = amountOfParameters +1;
     }
 
@@ -98,11 +98,12 @@ usuarioModel.getByUsuarioAndIdRol = async (conn, usuarioBean) => {
             queryFinal = queryFinal + whereCondition;
             queryParameters.push(usuarioBean.usuario);
         }
-        if(usuarioBean.id_rol){
+        if(usuarioBean.rol.id_rol){
             whereCondition = whereCondition + " usu.id_rol=$"+i;
             queryFinal = queryFinal + whereCondition;
-            queryParameters.push(usuarioBean.id_rol);
+            queryParameters.push(usuarioBean.rol.id_rol);
         }
+        i = i + 1;
     }
     console.log("queryFinal:", queryFinal);
     const queryResponse = await conn.query(queryFinal, queryParameters);

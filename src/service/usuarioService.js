@@ -269,4 +269,39 @@ usuarioService.updateById = async (req, res) => {
     }
 };
 
+usuarioService.searchByUsuarioAndIdRol = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar usuarios."
+        };
+        let { usuario, id_rol } = req.body;
+        console.log("usuario:", usuario);
+        if(!usuario){
+            usuario = null;
+        }
+        console.log("id_rol:", id_rol);
+        if(!id_rol){
+            id_rol = null;
+        }
+        const rolBean = new RolBean(id_rol, null, null);
+        const usuarioBean = new UsuarioBean(null, null, null, null, usuario, null, rolBean, null, null, null,
+            null, null, null, null, null);
+        
+        const usuarioModelRes = await usuarioModel.searchByUsuarioAndIdRol(postgresConn, usuarioBean);
+        if(usuarioModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista_usuarios = usuarioModelRes;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al buscar usaurios."
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en usuarioService.searchByUsuarioAndIdRol,', error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = usuarioService;
