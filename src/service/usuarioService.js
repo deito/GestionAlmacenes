@@ -8,6 +8,8 @@ const sesionModel = require('../model/sesionModel');
 const usuarioService = {};
 const postgresConn = require('../db/postgres');
 const crypto = require('crypto');
+const constantes = require('../util/constantes');
+const { connect } = require('http2');
 
 usuarioService.save = async (req, res) => {
     try {
@@ -42,12 +44,18 @@ usuarioService.save = async (req, res) => {
             apellidos = null;
         }
         console.log("usuario: "+usuario);
-        if(!usuario){
-            usuario = null;
+        if(!usuario || usuario == null || usuario == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo usuario no tiene un valor válido.";
+            res.status(200).json(response);
+            return;
         }
         console.log("contrasena: "+contrasena);
-        if(!contrasena){
-            contrasena = null;
+        if(!contrasena || contrasena == null || contrasena == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "La contraseña no tiene un valor válido.";
+            res.status(200).json(response);
+            return;
         }
         console.log("id_rol: "+id_rol);
         if(!id_rol){
@@ -182,6 +190,81 @@ usuarioService.getAll = async (req, res) => {
         res.status(200).json(response);
     } catch (error) {
         console.log('Error en usuarioService.getAll,', error);
+        res.status(500).send(error);
+    }
+};
+
+usuarioService.updateById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error desconocido al actualizar el usuario."
+        };
+        let { id_usuario, id_local, nombres, apellidos, contrasena, id_rol, tipo_documento, numero_documento, telefono, estado, modificado_por } = req.body;
+        
+        console.log("id_usuario: "+id_usuario);
+        if(!id_usuario || id_usuario == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El id_usuario no tiene un valor válido."
+            res.status(200).json(response);
+            return;
+        }
+        if(!id_local){
+            id_local = null;
+        }
+        if(!nombres){
+            nombres = null;
+        }
+        if(!apellidos){
+            apellidos = null;
+        }
+        console.log("contrasena: "+contrasena);
+        if(!contrasena || contrasena == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "La contraseña no tiene un valor válido.";
+            res.status(200).json(response);
+            return;
+        }
+        if(!id_rol){
+            id_rol = null;
+        }
+        if(!tipo_documento){
+            tipo_documento = null;
+        }
+        if(!numero_documento){
+            numero_documento = null;
+        }
+        if(!telefono){
+            telefono = null;
+        }
+        if(!estado || estado == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo estado no tiene un valor válido.";
+            res.status(200).json(response);
+            return;
+        }
+        if(!modificado_por || modificado_por == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo modificado_por no tiene un valor válido.";
+            res.status(200).json(response);
+            return;
+        }
+        let fecha_modificacion = new Date();
+        const localBean = new LocalBean(id_local, null, null, null, null, null, null, null, null, null);
+        const rolBean = new RolBean(id_rol, null, null);
+        const usuarioBean = new UsuarioBean(id_usuario, localBean, nombres, apellidos, null, contrasena, rolBean,
+            tipo_documento, numero_documento, telefono, estado, null, null, modificado_por, fecha_modificacion);
+        const usuarioModelRes = await usuarioModel.updateById(postgresConn, usuarioBean);
+        if(usuarioModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al intentar actualizar el usuario.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en usuarioService.updateById,', error);
         res.status(500).send(error);
     }
 };

@@ -12,4 +12,7 @@ router.post('/login', usuarioService.login);
 // obtener todos los usuarios
 router.get('/getAll', usuarioService.getAll);
 
+// actualizar usuario por id
+router.post('/updateById', usuarioService.updateById);
+
 module.exports = router;

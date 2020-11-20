@@ -59,6 +59,19 @@ usuarioModel.getAll = async (conn) => {
     return response;
 }
 
+usuarioModel.updateById = async (conn, usuarioBean) => {
+    const queryResponse = await conn.query("UPDATE rrn.tusuario SET id_local=$1, nombres=$2, apellidos=$3, contrasena=crypt($4,gen_salt('bf')), id_rol=$5,"
+    +" tipo_documento=$6, numero_documento=$7, telefono=$8, estado=$9, modificado_por=$10, fecha_modificacion=$11 WHERE id_usuario=$12",
+    [usuarioBean.local.id_local, usuarioBean.nombres, usuarioBean.apellidos, usuarioBean.contrasena, usuarioBean.rol.id_rol, 
+    usuarioBean.tipo_documento , usuarioBean.numero_documento, usuarioBean.telefono, usuarioBean.estado, usuarioBean.modificado_por, 
+    usuarioBean.fecha_modificacion, usuarioBean.id_usuario]);
+    console.log("usuarioModel.updateById queryResponse:", queryResponse);
+    if(queryResponse && queryResponse.rowCount == 1){
+        return true;
+    }
+    return false;
+};
+
 function extractUsuarioFromResponse(aRow){
     
     const rol_descripcion = aRow.rol_descripcion ? aRow.rol_descripcion : null;
