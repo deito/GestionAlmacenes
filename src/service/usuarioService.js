@@ -258,6 +258,7 @@ usuarioService.updateById = async (req, res) => {
         if(usuarioModelRes){
             response.resultado = 1;
             response.mensaje = "";
+            response.id_usuario = id_usuario;
         } else {
             response.resultado = 0;
             response.mensaje = "Error al intentar actualizar el usuario.";
