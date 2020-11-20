@@ -8,8 +8,8 @@ usuarioModel.save = async (conn, usuarioBean) => {
     const response = await conn.query(
         "INSERT INTO rrn.tusuario(id_local, nombres, apellidos, usuario, contrasena, id_rol, tipo_documento, numero_documento, telefono, estado, registrado_por, fecha_registro) "+
         "VALUES($1,$2,$3,$4,crypt($5, gen_salt('bf')),$6,$7,$8,$9,$10,$11,$12) RETURNING id_usuario", 
-        [ usuarioBean.localBean.id_local, usuarioBean.nombres, usuarioBean.apellidos, usuarioBean.usuario, usuarioBean.contrasena, 
-            usuarioBean.rolBean.id_rol, usuarioBean.tipo_documento, usuarioBean.numero_documento, usuarioBean.telefono, usuarioBean.estado, 
+        [ usuarioBean.local.id_local, usuarioBean.nombres, usuarioBean.apellidos, usuarioBean.usuario, usuarioBean.contrasena, 
+            usuarioBean.rol.id_rol, usuarioBean.tipo_documento, usuarioBean.numero_documento, usuarioBean.telefono, usuarioBean.estado, 
             usuarioBean.registrado_por, usuarioBean.fecha_registro ]
     );
     console.log("usuarioModel.save response: ", response);
@@ -71,6 +71,46 @@ usuarioModel.updateById = async (conn, usuarioBean) => {
         return true;
     }
     return false;
+};
+
+usuarioModel.getByUsuarioAndIdRol = async (conn, usuarioBean) => {    
+    let queryFinal = "SELECT usu.* FROM rrn.tusuario usu";
+    let amountOfParameters = 1;
+    let whereCondition = "";
+    let queryParameters = [];
+    if(usuarioBean.usuario){        
+        amountOfParameters = amountOfParameters +1;
+    }
+    if(usuarioBean.id_rol){
+        amountOfParameters = amountOfParameters +1;
+    }
+
+    if(amountOfParameters > 0){
+        whereCondition = " WHERE";
+    }
+
+    for(let i=1;i <= amountOfParameters;){      
+        if(i > 1){
+            whereCondition = whereCondition + " AND"
+        }  
+        if(usuarioBean.usuario){
+            whereCondition = whereCondition + " usu.usuario like '%$"+i+"%'";
+            queryFinal = queryFinal + whereCondition;
+            queryParameters.push(usuarioBean.usuario);
+        }
+        if(usuarioBean.id_rol){
+            whereCondition = whereCondition + " usu.id_rol=$"+i;
+            queryFinal = queryFinal + whereCondition;
+            queryParameters.push(usuarioBean.id_rol);
+        }
+    }
+    console.log("queryFinal:", queryFinal);
+    const queryResponse = await conn.query(queryFinal, queryParameters);
+    const response = [];
+    for(let i = 0;i < queryResponse.rows.length;i++){
+        response.push(extractUsuarioFromResponse(queryResponse.rows[i]));
+    }
+    return response;
 };
 
 function extractUsuarioFromResponse(aRow){
