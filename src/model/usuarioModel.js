@@ -75,36 +75,42 @@ usuarioModel.updateById = async (conn, usuarioBean) => {
 
 usuarioModel.searchByUsuarioAndIdRol = async (conn, usuarioBean) => {    
     let queryFinal = "SELECT usu.* FROM rrn.tusuario usu";
-    let amountOfParameters = 1;
     let whereCondition = "";
     let queryParameters = [];
-    if(usuarioBean.usuario){        
-        amountOfParameters = amountOfParameters +1;
+    let parameterNames = [];
+    if(usuarioBean.usuario){
+        parameterNames.push("usuario");
+        console.log("Se agrego el parametro 'usuario'");
     }
     if(usuarioBean.rol.id_rol){
-        amountOfParameters = amountOfParameters +1;
+        parameterNames.push("id_rol");
+        console.log("Se agrego el parametro 'id_rol'");
     }
 
-    if(amountOfParameters > 0){
+    if(parameterNames.length > 0){
         whereCondition = " WHERE";
     }
 
-    for(let i=1;i <= amountOfParameters;){      
-        if(i > 1){
+    for(let i=0;i < parameterNames.length;){    
+        if(i > 0){
             whereCondition = whereCondition + " AND"
         }  
-        if(usuarioBean.usuario){
-            whereCondition = whereCondition + " usu.usuario like '%$"+i+"%'";
-            queryFinal = queryFinal + whereCondition;
+        console.log("parameterNames["+i+"]: "+parameterNames[i]);
+        if(parameterNames[i] == "usuario"){
+            whereCondition = whereCondition + " usu.usuario like '%'||$"+(i+1)+"||'%'";
+            
             queryParameters.push(usuarioBean.usuario);
+            console.log("Se agrego query para 'usuario' y i = ", i);
         }
-        if(usuarioBean.rol.id_rol){
-            whereCondition = whereCondition + " usu.id_rol=$"+i;
-            queryFinal = queryFinal + whereCondition;
+        if(parameterNames[i] == "id_rol"){
+            whereCondition = whereCondition + " usu.id_rol=$"+(i+1);
             queryParameters.push(usuarioBean.rol.id_rol);
+            console.log("Se agrego query para 'id_rol' y i = ", i);
         }
         i = i + 1;
     }
+
+    queryFinal = queryFinal + whereCondition;
     console.log("queryFinal:", queryFinal);
     const queryResponse = await conn.query(queryFinal, queryParameters);
     const response = [];
