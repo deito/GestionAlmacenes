@@ -320,6 +320,7 @@ usuarioService.getById = async (req, res) => {
         if(usuarioModelRes){
             response.resultado = 1;
             response.mensaje = "";
+            usuarioModelRes[0].contrasena = null;
             response.usuario = usuarioModelRes[0];
         }
         res.status(200).json(response);
