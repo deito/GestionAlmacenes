@@ -220,10 +220,7 @@ usuarioService.updateById = async (req, res) => {
         }
         console.log("contrasena: "+contrasena);
         if(!contrasena || contrasena == constantes.emptyString){
-            response.resultado = 0;
-            response.mensaje = "La contraseña no tiene un valor válido.";
-            res.status(200).json(response);
-            return;
+            contrasena = null;
         }
         if(!id_rol){
             id_rol = null;
