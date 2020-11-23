@@ -120,6 +120,23 @@ usuarioModel.searchByUsuarioAndIdRol = async (conn, usuarioBean) => {
     return response;
 };
 
+usuarioModel.getById = async (conn, id) => {
+    const queryResponse = await conn.query("SELECT usu.* "
+    +", rol.descripcion as rol_descripcion, rol.estado rol_estado,"
+    +" local.codigo as local_codigo, local.nombre as local_nombre, local.telefono as local_telefono, local.direccion as local_direccion,"
+    +" local.estado as local_estado, local.registrado_por as local_registrado_por, local.fecha_registro as local_fecha_registro,"
+    +" local.modificado_por as local_modificado_por, local.fecha_modificacion as local_fecha_modificacion"
+    +" FROM rrn.tusuario usu"
+    +" left join rrn.trol rol on rol.id_rol = usu.id_rol"
+    +" left join rrn.tlocal local on local.id_local = usu.id_local "
+    +" WHERE usu.id_usuario=$1",[id]);
+    const response = [];
+    for(let i = 0;i < queryResponse.rows.length;i++){
+        response.push(extractUsuarioFromResponse(queryResponse.rows[i]));
+    }
+    return response;
+};
+
 function extractUsuarioFromResponse(aRow){
     
     const rol_descripcion = aRow.rol_descripcion ? aRow.rol_descripcion : null;

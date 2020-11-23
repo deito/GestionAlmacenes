@@ -305,4 +305,28 @@ usuarioService.searchByUsuarioAndIdRol = async (req, res) => {
     }
 };
 
+usuarioService.getById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar usuario."
+        };
+        const { id } = req.query;
+        if(!id){
+            response.resultado = 0;
+            response.mensaje = "El campo id no tiene un valor válido. id = "+id;
+        }
+        const usuarioModelRes = await usuarioModel.getById(postgresConn, id);
+        if(usuarioModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.usuario = usuarioModelRes[0];
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en usuarioService.getById,', error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = usuarioService;

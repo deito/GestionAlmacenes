@@ -18,4 +18,7 @@ router.post('/updateById', usuarioService.updateById);
 // search by usuario and id_rol
 router.post('/searchByUsuarioAndIdRol', usuarioService.searchByUsuarioAndIdRol);
 
+// get by id
+router.get('/getById', usuarioService.getById);
+
 module.exports = router;
