@@ -32,6 +32,19 @@ localModel.getAll = async (conn) => {
     return response;
 };
 
+localModel.getById = async (conn, id) => {
+    const queryResponse = await conn.query("SELECT local.* FROM rrn.tlocal local WHERE local.id_local=$1",[id]);
+    console.log("localModel.getById queryResponse:", queryResponse);
+    /*
+    const response = [];
+    for(let i=0; i<queryResponse.rows.length; i++){
+        response.push(extractLocalFromResponse(queryResponse.rows[i]));
+    }
+    return response;
+    */
+   return queryResponse.rows;
+};
+
 function extractLocalFromResponse(aRow){
     const id_local = aRow.id_local ? aRow.id_local : null;
     const codigo = aRow.codigo ? aRow.codigo : null;

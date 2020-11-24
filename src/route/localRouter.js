@@ -12,4 +12,7 @@ router.post('/updateById', localService.updateById);
 // obtener todos los locales
 router.get('/getAll', localService.getAll);
 
+// obtener por id
+router.get('/getById', localService.getById);
+
 module.exports = router;

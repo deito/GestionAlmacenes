@@ -120,4 +120,34 @@ localService.getAll = async (req, res) => {
     }
 };
 
+localService.getById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar local por id."
+        };
+        const { id } = req.query;
+        if(!id){
+            response.resultado = 0;
+            response.mensaje = "El campo id no tiene un valor válido. id = "+id;
+        }
+        const localModelRes = await localModel.getById(postgresConn, id);
+        if(localModelRes){
+            if(localModelRes.length > 0){
+                response.resultado = 1;
+                response.mensaje = "";
+                response.local = localModelRes[0];
+            } else {
+                response.resultado = 1;
+                response.mensaje = "";
+                response.local = {};
+            }
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en localService.getById,", error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = localService;

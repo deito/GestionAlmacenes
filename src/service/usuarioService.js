@@ -306,7 +306,7 @@ usuarioService.getById = async (req, res) => {
     try {
         const response = {
             resultado: 0,
-            mensaje: "Error inesperado al buscar usuario."
+            mensaje: "Error inesperado al buscar usuario por id."
         };
         const { id } = req.query;
         if(!id){
@@ -315,10 +315,16 @@ usuarioService.getById = async (req, res) => {
         }
         const usuarioModelRes = await usuarioModel.getById(postgresConn, id);
         if(usuarioModelRes){
-            response.resultado = 1;
-            response.mensaje = "";
-            usuarioModelRes[0].contrasena = null;
-            response.usuario = usuarioModelRes[0];
+            if(usuarioModelRes.length > 0){
+                response.resultado = 1;
+                response.mensaje = "";
+                usuarioModelRes[0].contrasena = null;
+                response.usuario = usuarioModelRes[0];
+            } else {
+                response.resultado = 1;
+                response.mensaje = "";
+                response.usuario = {};
+            }
         }
         res.status(200).json(response);
     } catch (error) {
