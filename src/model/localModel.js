@@ -45,6 +45,11 @@ localModel.getById = async (conn, id) => {
    return queryResponse.rows;
 };
 
+localModel.searchByNombre = async (conn, nombreParam) => {
+    const queryResponse = await conn.query("SELECT local.* FROM rrn.tlocal local WHERE local.nombre like '%'||$1||'%'",[nombreParam]);
+    return queryResponse.rows;
+};
+
 function extractLocalFromResponse(aRow){
     const id_local = aRow.id_local ? aRow.id_local : null;
     const codigo = aRow.codigo ? aRow.codigo : null;

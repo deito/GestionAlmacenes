@@ -293,7 +293,7 @@ usuarioService.searchByUsuarioAndIdRol = async (req, res) => {
             response.lista_usuarios = usuarioModelRes;
         } else {
             response.resultado = 0;
-            response.mensaje = "Error al buscar usaurios."
+            response.mensaje = "Error al buscar usaurios en usuarioModel.searchByUsuarioAndIdRol ."
         }
         res.status(200).json(response);
     } catch (error) {

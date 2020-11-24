@@ -15,4 +15,7 @@ router.get('/getAll', localService.getAll);
 // obtener por id
 router.get('/getById', localService.getById);
 
+// buscar por nombre
+router.post('/searchByNombre', localService.searchByNombre);
+
 module.exports = router;

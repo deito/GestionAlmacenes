@@ -1,6 +1,7 @@
 const LocalBean = require('../bean/localBean');
 const localModel = require('../model/localModel');
 const postgresConn = require('../db/postgres');
+const usuarioModel = require('../model/usuarioModel');
 const localService = {};
 
 localService.save = async (req, res) => {
@@ -146,6 +147,29 @@ localService.getById = async (req, res) => {
         res.status(200).json(response);
     } catch (error) {
         console.log("Error en localService.getById,", error);
+        res.status(500).send(error);
+    }
+};
+
+localService.searchByNombre = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar locales por nombre."
+        };
+        const { nombre } = req.body;
+        const localModelRes = await localModel.searchByNombre(postgresConn, nombre);
+        if(localModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista_locales = localModelRes;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al buscar locales en localModel.searchByNombre .";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en localService.searchByNombre,', error);
         res.status(500).send(error);
     }
 };
