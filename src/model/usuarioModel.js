@@ -251,6 +251,16 @@ usuarioModel.getById = async (conn, id) => {
    return queryResponse.rows;
 };
 
+usuarioModel.updateEstadoById = async (conn, usuarioBean) => {
+    const queryResponse = await conn.query("UPDATE rrn.tusuario SET estado=$1, modificado_por=$2, fecha_modificacion=$3 WHERE id_usuario=$4", 
+        [usuarioBean.estado, usuarioBean.modificado_por , usuarioBean.fecha_modificacion , usuarioBean.id_usuario]);
+    console.log("usuarioModel.updateEstadoById queryResponse:", queryResponse);
+    if(queryResponse && queryResponse.rowCount == 1){
+        return true;
+    }
+    return false;
+};
+
 function extractUsuarioFromResponse(aRow){
     
     const rol_descripcion = aRow.rol_descripcion ? aRow.rol_descripcion : null;

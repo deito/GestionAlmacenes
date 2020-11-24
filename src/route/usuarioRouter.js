@@ -21,4 +21,7 @@ router.post('/searchByUsuarioAndIdRol', usuarioService.searchByUsuarioAndIdRol);
 // get by id
 router.get('/getById', usuarioService.getById);
 
+// actualizar estado por id
+router.post('/updateEstadoById', usuarioService.updateEstadoById);
+
 module.exports = router;

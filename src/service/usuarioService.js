@@ -327,4 +327,40 @@ usuarioService.getById = async (req, res) => {
     }
 };
 
+usuarioService.updateEstadoById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al actualizar el estado del usuario."
+        };
+        const { estado, id_usuario, modificado_por } = req.body;
+        if(!id_usuario || id_usuario == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El id_usuario no tiene un valor válido."
+            res.status(200).json(response);
+            return;
+        }
+        if(!estado || estado == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo estado no tiene un valor válido.";
+            res.status(200).json(response);
+            return;
+        }
+        const fecha_modificacion = new Date();
+        console.log("fecha_modificacion: ", fecha_modificacion);
+        const usuarioBean = new UsuarioBean(id_usuario, null, null, null, null, null, null, null, null, null, estado,
+            null, null, modificado_por, fecha_modificacion);
+        const usuarioModelRes = await usuarioModel.updateEstadoById(postgresConn, usuarioBean);
+        if(usuarioModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.id_usuario = id_usuario;
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en usuarioService.updateEstadoById,', error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = usuarioService;
