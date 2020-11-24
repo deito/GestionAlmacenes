@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const app = express();
 
 // settings
-app.set('json spaces',2);
+//app.set('json spaces',2);
 
 // middlewares
 app.use(morgan('dev'));
@@ -14,7 +14,8 @@ app.use(express.urlencoded({extended: false}));
 // Routes
 app.use('/usuario',require('./route/usuarioRouter'));
 app.use('/local', require('./route/localRouter'));
-app.use('/rol/', require('./route/rolRouter'));
+app.use('/rol', require('./route/rolRouter'));
+app.use('/cliente', require('./route/clienteRouter'));
 
 // Export the app instance
 module.exports = app;
