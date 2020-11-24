@@ -352,6 +352,12 @@ usuarioService.updateEstadoById = async (req, res) => {
             res.status(200).json(response);
             return;
         }
+        if(!modificado_por || modificado_por == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo modificado_por no tiene un valor válido.";
+            res.status(200).json(response);
+            return;
+        }
         const fecha_modificacion = new Date();
         console.log("fecha_modificacion: ", fecha_modificacion);
         const usuarioBean = new UsuarioBean(id_usuario, null, null, null, null, null, null, null, null, null, estado,

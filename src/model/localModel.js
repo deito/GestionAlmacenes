@@ -50,6 +50,17 @@ localModel.searchByNombre = async (conn, nombreParam) => {
     return queryResponse.rows;
 };
 
+localModel.updateEstadoById = async (conn, localBean) => {
+    const queryResponse = await conn.query("UPDATE rrn.tlocal SET estado=$1, modificado_por=$2, fecha_modificacion=$3 WHERE id_local=$4",
+        [localBean.estado, localBean.modificado_por, localBean.fecha_modificacion, localBean.id_local]);
+    console.log("localModel.updateEstadoById queryResponse:", queryResponse);
+    if(queryResponse && queryResponse.rowCount > 0){
+        return true;
+    }
+    return false;
+};
+
+
 function extractLocalFromResponse(aRow){
     const id_local = aRow.id_local ? aRow.id_local : null;
     const codigo = aRow.codigo ? aRow.codigo : null;

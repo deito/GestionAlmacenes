@@ -2,6 +2,7 @@ const LocalBean = require('../bean/localBean');
 const localModel = require('../model/localModel');
 const postgresConn = require('../db/postgres');
 const usuarioModel = require('../model/usuarioModel');
+const constantes = require('../util/constantes');
 const localService = {};
 
 localService.save = async (req, res) => {
@@ -170,6 +171,47 @@ localService.searchByNombre = async (req, res) => {
         res.status(200).json(response);
     } catch (error) {
         console.log('Error en localService.searchByNombre,', error);
+        res.status(500).send(error);
+    }
+};
+
+localService.updateEstadoById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al actualizar el estado del local."
+        };
+        const { estado, id_local, modificado_por } = req.body;
+        if(!id_local || id_local == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo id_local no tiene un valor válido.";
+            res.status(200).json(response);
+            return;
+        }
+        if(!estado || estado == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo estado no tiene un valor válido.";
+            res.status(200).json(response);
+            return;
+        }
+        if(!modificado_por || modificado_por == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo modificado_por no tiene un valor válido.";
+            res.status(200).json(response);
+            return;
+        }
+        const fecha_modificacion = new Date();
+        console.log("fecha_modificacion:", fecha_modificacion);
+        const localBean = new LocalBean(id_local, null, null, null, null, estado, null, null, modificado_por, fecha_modificacion);
+        const localModelRes = await localModel.updateEstadoById(postgresConn, localBean);
+        if(localModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.id_local = id_local;
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en localService.updateEstadoById,', error);
         res.status(500).send(error);
     }
 };

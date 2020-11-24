@@ -18,4 +18,7 @@ router.get('/getById', localService.getById);
 // buscar por nombre
 router.post('/searchByNombre', localService.searchByNombre);
 
+// actualizar estado por id
+router.post('/updateEstadoById', localService.updateEstadoById);
+
 module.exports = router;
