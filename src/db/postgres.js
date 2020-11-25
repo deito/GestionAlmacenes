@@ -19,8 +19,8 @@ const pool = new Pool({
     port: config.postgres.port,
     database: config.postgres.database,    
     max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    idleTimeoutMillis: 0,
+    connectionTimeoutMillis: 0,
   });
 
 module.exports = {
