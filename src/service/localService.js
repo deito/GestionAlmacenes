@@ -31,7 +31,7 @@ localService.save = async (req, res) => {
             registrado_por = null;
         }
         
-        fecha_registro = new Date();
+        const fecha_registro = new Date();
         const localBean = new LocalBean(null, codigo, nombre, telefono, direccion, estado, registrado_por, fecha_registro, null, null);
         const localModelRes = await localModel.save(postgresConn, localBean);
         if(localModelRes && localModelRes[0].id_local && localModelRes[0].id_local !=0){
