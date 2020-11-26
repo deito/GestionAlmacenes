@@ -2,7 +2,7 @@ const clienteModel = require('../model/clienteModel');
 const postgresConn = require('../db/postgres');
 const ClienteBean = require('../bean/clienteBean');
 const constantes = require('../util/constantes');
-const { connect } = require('..');
+
 const clienteService = {};
 
 clienteService.getAll = async (req, res) => {
@@ -141,5 +141,37 @@ clienteService.updateById = async (req, res) => {
         res.status(500).send(error);
     }
 };
+
+clienteService.searchByRazonSocialAndTipoCliente = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar clientes."
+        };
+        let { razon_social, tipo_cliente } = req.body;
+        console.log("razon_social:", razon_social);
+        if(!razon_social){
+            razon_social = null;
+        }
+        console.log("tipo_cliente:", tipo_cliente);
+        if(!tipo_cliente){
+            tipo_cliente = null;
+        }
+        const clienteBean = new ClienteBean(null, tipo_cliente, null, null, razon_social, null, null, null, null, null, null, null, null);
+        const clienteModelRes = await clienteModel.searchByRazonSocialAndTipoCliente(postgresConn, clienteBean);
+        if(clienteModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista = clienteModelRes;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al buscar clientes en clienteService.searchByRazonSocialAndTipoCliente";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en clienteService.searchByRazonSocialAndTipoCliente,', error);
+        res.status(500).send(error);
+    }
+}
 
 module.exports = clienteService;

@@ -1,3 +1,5 @@
+const constantes = require("../util/constantes");
+
 const clienteModel = {};
 
 clienteModel.getAll = async (conn) => {
@@ -30,6 +32,43 @@ clienteModel.updateById = async (conn, clienteBean) => {
         return true;
     }
     return false;
+};
+
+clienteModel.searchByRazonSocialAndTipoCliente = async (conn, clienteBean) => {
+    let queryFinal = "SELECT cliente.* FROM rrn.tcliente cliente";
+    let whereCondition = "";
+    let queryParameters = [];
+    let parameterNames = [];
+    if(clienteBean.razon_social && clienteBean.razon_social != constantes.emptyString){
+        parameterNames.push("razon_social");
+    }
+    if(clienteBean.tipo_cliente && clienteBean.tipo_cliente != constantes.emptyString){
+        parameterNames.push("tipo_cliente");
+    }
+
+    if(parameterNames.length > 0){
+        whereCondition = " WHERE";
+    }
+
+    for(let i=0;i < parameterNames.length; i++){
+        if(i > 0){
+            whereCondition = whereCondition + " AND"
+        }
+
+        if(parameterNames[i] == "razon_social"){
+            whereCondition = whereCondition + " UPPER(cliente.razon_social) like '%'||UPPER($"+(i+1)+")||'%'";
+            queryParameters.push(clienteBean.razon_social);
+        }
+        if(parameterNames[i] == "tipo_cliente"){
+            whereCondition = whereCondition + " UPPER(cliente.tipo_cliente) like '%'||UPPER($"+(i+1)+")||'%'";
+            queryParameters.push(clienteBean.tipo_cliente);
+        }
+    }
+
+    queryFinal = queryFinal + whereCondition;
+    console.log("searchByRazonSocialAndTipoCliente queryFinal:", queryFinal);
+    const queryResponse = await conn.query(queryFinal, queryParameters);
+    return queryResponse.rows;
 };
 
 module.exports = clienteModel;

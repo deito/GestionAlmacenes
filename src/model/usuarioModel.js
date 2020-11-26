@@ -204,7 +204,7 @@ usuarioModel.searchByUsuarioAndIdRol = async (conn, usuarioBean) => {
         }  
         console.log("parameterNames["+i+"]: "+parameterNames[i]);
         if(parameterNames[i] == "usuario"){
-            whereCondition = whereCondition + " usu.usuario like '%'||$"+(i+1)+"||'%'";
+            whereCondition = whereCondition + " UPPER(usu.usuario) like '%'||UPPER($"+(i+1)+")||'%'";
             
             queryParameters.push(usuarioBean.usuario);
             console.log("Se agrego query para 'usuario' y i = ", i);
