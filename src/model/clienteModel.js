@@ -14,4 +14,10 @@ clienteModel.save = async (conn, clienteBean) => {
     return queryResponse.rows;
 };
 
+clienteModel.getById = async (conn, id) => {
+    const queryResponse = await conn.query("SELECT cliente.* FROM rrn.tcliente cliente WHERE cliente.id_cliente=$1",[id]);
+    console.log("clienteModel.getById queryResponse:", queryResponse);
+    return queryResponse.rows;
+};
+
 module.exports = clienteModel;

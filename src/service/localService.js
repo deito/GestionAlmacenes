@@ -134,7 +134,7 @@ localService.getById = async (req, res) => {
             response.mensaje = "El campo id no tiene un valor válido. id = "+id;
         }
         const localModelRes = await localModel.getById(postgresConn, id);
-        if(localModelRes){
+        if(localModelRes && localModelRes.length > 0){
             if(localModelRes.length > 0){
                 response.resultado = 1;
                 response.mensaje = "";
