@@ -56,11 +56,11 @@ localService.updateById = async (req, res) => {
             mensaje: "Error inesperado al actualizar Local."
         };
         
-        let { id_local, codigo, nombre, telefono, direccion, estado, modificado_por, fecha_modificacion } = req.body;
+        let { id_local, codigo, nombre, telefono, direccion, estado, modificado_por } = req.body;
         console.log("id_local:", id_local);
         if(!id_local || id_local == 0){
             response.resultado = 0;
-            response.mensaje = "El id_local no tiene un valor válido.";
+            response.mensaje = "El id_local no tiene un valor válido. Tipo de dato: '"+(typeof id_local)+"', valor = "+id_local;
             res.status(200).json(response);
             return;
         }
@@ -85,7 +85,7 @@ localService.updateById = async (req, res) => {
             res.status(200).json(response);
             return;
         }
-        fecha_modificacion = new Date();
+        const fecha_modificacion = new Date();
         const localBean = new LocalBean(id_local, codigo, nombre, telefono, direccion, estado, null, null, modificado_por, fecha_modificacion);
         const responseLocalModel = await localModel.updateById(postgresConn, localBean);
         if(responseLocalModel){

@@ -11,4 +11,7 @@ router.post('/save', clienteService.save);
 // obtener cliente por id
 router.get('/getById', clienteService.getById);
 
+// actualizar por id
+router.post('/updateById', clienteService.updateById);
+
 module.exports = router;
