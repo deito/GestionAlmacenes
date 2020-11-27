@@ -61,4 +61,54 @@ productoService.save = async (req, res) => {
     }
 };
 
+productoService.updateById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al actualizar el producto."
+        };
+        let { id_producto, codigo, nombre, marca, talla, color, precio_venta, estado,
+            modificado_por } = req.body;
+        if(!id_producto){
+            response.resultado = 0;
+            response.mensaje = "El id_producto no tiene un valor válido. Tipo de dato: '"+(typeof id_producto)+"', valor = "+id_producto;
+            res.status(200).json(response);
+            return;
+        }
+        if(!codigo || codigo == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El codigo no tiene un valor válido. Tipo de dato: '"+(typeof codigo)+"', valor = "+codigo;
+            res.status(200).json(response);
+            return;
+        }
+        if(!estado || estado == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El estado no tiene un valor válido. Tipo de dato: '"+(typeof estado)+"', valor = "+estado;
+            res.status(200).json(response);
+            return;
+        }
+        if(!modificado_por){
+            response.resultado = 0;
+            response.mensaje = "El campo modificado_por no tiene un valor válido. Tipo de dato: '"+(typeof modificado_por)+"', valor = "+modificado_por;
+            res.status(200).json(response);
+            return;
+        }
+        const fecha_modificacion = new Date();
+        const productoBean = new ProductoBean(id_producto, codigo, nombre, marca, talla, color, precio_venta, estado, null, null,
+            modificado_por, fecha_modificacion);
+        const productoModelRes = await productoModel.updateById(postgresConn, productoBean);
+        if(productoModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+        } else {
+            response.resultado = 1;
+            response.mensaje = "Error al intentar actualizar el Producto";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en productoService.updateById,", error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = productoService;

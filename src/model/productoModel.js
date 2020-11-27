@@ -15,4 +15,15 @@ productoModel.save = async (conn, productoBean) => {
     return queryResponse.rows;
 };
 
+productoModel.updateById = async (conn, productoBean) => {
+    const queryResponse = await conn.query("UPDATE rrn.tproducto SET codigo=$1, nombre=$2, marca=$3, talla=$4, color=$5, precio_venta=$6, estado=$7,"
+    +" modificado_por=$8, fecha_modificacion=$9 WHERE id_producto=$10", [productoBean.codigo, productoBean.nombre, productoBean.marca, productoBean.talla, productoBean.color, productoBean.precio_venta, 
+    productoBean.estado, productoBean.modificado_por, productoBean.fecha_modificacion, productoBean.id_producto]);
+    console.log("productoModel.updateById queryResponse:", queryResponse);
+    if(queryResponse && queryResponse.rowCount > 0){
+        return true;
+    }
+    return false;
+}
+
 module.exports = productoModel;
