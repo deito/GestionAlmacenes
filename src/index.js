@@ -17,6 +17,7 @@ app.use('/local', require('./route/localRouter'));
 app.use('/rol', require('./route/rolRouter'));
 app.use('/cliente', require('./route/clienteRouter'));
 app.use('/producto', require('./route/productoRouter'));
+app.use('/proveedor', require('./route/proveedorRouter'));
 
 // Export the app instance
 module.exports = app;

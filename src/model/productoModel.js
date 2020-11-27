@@ -1,4 +1,3 @@
-const constantes = require("../util/constantes");
 const productoModel = {};
 
 productoModel.getAll = async (conn) => {
