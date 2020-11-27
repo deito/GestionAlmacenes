@@ -11,4 +11,7 @@ router.post('/save', proveedorService.save);
 // obtener por id
 router.get('/getById', proveedorService.getById);
 
+// actualizar por id
+router.post('/updateById', proveedorService.updateById);
+
 module.exports = router;

@@ -90,4 +90,48 @@ proveedorService.getById = async (req, res) => {
     }
 };
 
+proveedorService.updateById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al actualizar el proveedor."
+        };
+        let { id_proveedor, tipo_proveedor, tipo_documento, numero_documento, razon_social, telefono, direccion,
+            correo, estado, modificado_por } = req.body;
+        if(!id_proveedor){
+            response.resultado = 0;
+            response.mensaje = "El id_proveedor no tiene un valor válido. Tipo de dato: '"+(typeof id_proveedor)+"', valor = "+id_proveedor;
+            res.status(200).json(response);
+            return;
+        }
+        if(!estado || estado == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El estado no tiene un valor válido. Tipo de dato: '"+(typeof estado)+"', valor = "+estado;
+            res.status(200).json(response);
+            return;
+        }
+        if(!modificado_por){
+            response.resultado = 0;
+            response.mensaje = "El campo modificado_por no tiene un valor válido. Tipo de dato: '"+(typeof modificado_por)+"', valor = "+modificado_por;
+            res.status(200).json(response);
+            return;
+        }
+        const fecha_modificacion = new Date();
+        const proveedorBean = new ProveedorBean(id_proveedor, tipo_proveedor, tipo_documento, numero_documento, razon_social, telefono, direccion, correo,
+            estado, null, null, modificado_por, fecha_modificacion);
+        const proveedorModelRes = await proveedorModel.updateById(postgresConn, proveedorBean);
+        if(proveedorModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+        } else {
+            response.resultado = 1;
+            response.mensaje = "Error al intentar actualizar el Proveedor.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en proveedorService.updateById,", error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = proveedorService;
