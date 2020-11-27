@@ -24,6 +24,11 @@ productoModel.updateById = async (conn, productoBean) => {
         return true;
     }
     return false;
-}
+};
+
+productoModel.getById = async (conn, id) => {
+    const queryResponse = await conn.query("SELECT producto.* FROM rrn.tproducto producto WHERE producto.id_producto=$1",[id]);
+    return queryResponse.rows;
+};
 
 module.exports = productoModel;

@@ -111,4 +111,32 @@ productoService.updateById = async (req, res) => {
     }
 };
 
+productoService.getById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar producto por id."
+        };
+        const { id } = req.query;
+        if(!id){
+            response.resultado = 0;
+            response.mensaje = "El campo id no tiene un valor válido. id = "+id;
+        }
+        const productoModelRes = await productoModel.getById(postgresConn, id);
+        if(productoModelRes && productoModelRes.length > 0){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.objeto = productoModelRes[0];
+        } else {
+            response.resultado = 1;
+            response.mensaje = "";
+            response.objeto = {};
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en productoService.getById,", error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = productoService;

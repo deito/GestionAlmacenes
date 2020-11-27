@@ -11,4 +11,7 @@ router.post('/save', productoService.save);
 // actualizar producto por id
 router.post('/updateById', productoService.updateById);
 
+// obtener producto por id
+router.get('/getById', productoService.getById);
+
 module.exports = router;
