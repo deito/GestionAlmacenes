@@ -1,5 +1,7 @@
-const constantes = {
-    emptyString: ""
-};
+class Constantes {
+    constructor() {
+        this.emptyString = "";
+    }
+}
 
-module.exports = constantes;
+module.exports = new Constantes();
