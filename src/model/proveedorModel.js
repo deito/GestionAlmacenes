@@ -13,4 +13,9 @@ proveedorModel.save = async (conn, proveedorBean) => {
     return queryResponse.rows;
 };
 
+proveedorModel.getById = async (conn, id) => {
+    const queryResponse = await conn.query("SELECT proveedor.* FROM rrn.tproveedor proveedor WHERE proveedor.id_proveedor=$1",[id]);
+    return queryResponse.rows;
+};
+
 module.exports = proveedorModel;

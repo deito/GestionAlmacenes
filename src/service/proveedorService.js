@@ -62,4 +62,32 @@ proveedorService.save = async (req, res) => {
     }
 };
 
+proveedorService.getById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar proveedor por id."
+        };
+        const { id } = req.query;
+        if(!id){
+            response.resultado = 0;
+            response.mensaje = "El campo id no tiene un valor válido. id = "+id;
+        }
+        const proveedorModelRes = await proveedorModel.getById(postgresConn, id);
+        if(proveedorModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            if(proveedorModelRes.length > 0){
+                response.objeto = proveedorModelRes[0];
+            } else {
+                response.objeto = {};
+            }
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en proveedorService.getById,", error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = proveedorService;
