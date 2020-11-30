@@ -162,4 +162,44 @@ productoService.searchByCodigo = async (req, res) => {
     }
 };
 
+productoService.updateEstadoById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al actualizar el estado del producto."
+        };
+        const { estado, id_producto, modificado_por } = req.body;
+        if(!id_producto || id_producto == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo id_producto no tiene un valor válido. Tipo de dato: '"+(typeof id_producto)+"', valor = "+id_producto;
+            res.status(200).json(response);
+            return;
+        }
+        if(!estado || estado == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo estado no tiene un valor válido. Tipo de dato: '"+(typeof estado)+"', valor = "+estado;
+            res.status(200).json(response);
+            return;
+        }
+        if(!modificado_por || modificado_por == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo modificado_por no tiene un valor válido. Tipo de dato: '"+(typeof modificado_por)+"', valor = "+modificado_por;
+            res.status(200).json(response);
+            return;
+        }
+        const fecha_modificacion = new Date();
+        const productoBean = new ProductoBean(id_producto, null, null, null, null, null, null, estado, null, null, modificado_por, fecha_modificacion);
+        const productoModelRes = await productoModel.updateEstadoById(postgresConn, productoBean);
+        if(productoModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.id = id_producto;
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en productoService.updateEstadoById,', error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = productoService;

@@ -35,4 +35,13 @@ productoModel.searchByCodigo = async (conn, codigo) => {
     return queryResponse.rows;
 };
 
+productoModel.updateEstadoById = async (conn, productoBean) => {
+    const queryResponse = await conn.query("UPDATE rrn.tproducto SET estado=$1, modificado_por=$2, fecha_modificacion=$3 WHERE id_producto=$4", 
+    [productoBean.estado, productoBean.modificado_por, productoBean.fecha_modificacion, productoBean.id_producto]);
+    if(queryResponse && queryResponse.rowCount > 0){
+        return true;
+    }
+    return false;
+};
+
 module.exports = productoModel;
