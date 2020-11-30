@@ -46,7 +46,7 @@ localModel.getById = async (conn, id) => {
 };
 
 localModel.searchByNombre = async (conn, nombreParam) => {
-    const queryResponse = await conn.query("SELECT local.* FROM rrn.tlocal local WHERE local.nombre like '%'||$1||'%'",[nombreParam]);
+    const queryResponse = await conn.query("SELECT local.* FROM rrn.tlocal local WHERE UPPER(local.nombre) like '%'||UPPER($1)||'%'",[nombreParam]);
     return queryResponse.rows;
 };
 
