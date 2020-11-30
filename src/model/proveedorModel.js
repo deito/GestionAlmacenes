@@ -1,3 +1,5 @@
+const constantes = require("../util/constantes");
+
 const proveedorModel = {};
 
 proveedorModel.getAll = async (conn) => {
@@ -27,6 +29,43 @@ proveedorModel.updateById = async (conn, proveedorBean) => {
         return true;
     }
     return false;
+};
+
+proveedorModel.searchByRazonSocialAndTipoProveedor = async (conn, proveedorBean) => {
+    let finalquery = "SELECT proveedor.* FROM rrn.tproveedor proveedor";
+    let whereCondition = "";
+    let queryParameters = [];
+    let parameterNames = [];
+    if(proveedorBean.razon_social && proveedorBean.razon_social != constantes.emptyString){
+        parameterNames.push("razon_social");
+    }
+    if(proveedorBean.tipo_proveedor){
+        parameterNames.push("tipo_proveedor");
+    }
+
+    if(parameterNames.length > 0){
+        whereCondition = " WHERE";
+    }
+
+    for(let i=0;i < parameterNames.length; i++){
+        if(i > 0){
+            whereCondition = whereCondition + " AND"
+        }
+
+        if(parameterNames[i] == "razon_social"){
+            whereCondition = whereCondition + " UPPER(proveedor.razon_social) like '%'||UPPER($"+(i+1)+")||'%'";
+            queryParameters.push(proveedorBean.razon_social);
+        }
+        if(parameterNames[i] == "tipo_proveedor"){
+            whereCondition = whereCondition + " UPPER(proveedor.tipo_proveedor) like '%'||UPPER($"+(i+1)+")||'%'";
+            queryParameters.push(proveedorBean.tipo_proveedor);
+        }
+    }
+
+    finalquery = finalquery + whereCondition;
+    console.log("proveedorModel.searchByRazonSocialAndTipoProveedor finalquery:", finalquery);
+    const queryResponse = await conn.query(finalquery, queryParameters);
+    return queryResponse.rows;
 };
 
 module.exports = proveedorModel;

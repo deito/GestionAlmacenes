@@ -134,4 +134,36 @@ proveedorService.updateById = async (req, res) => {
     }
 };
 
+proveedorService.searchByRazonSocialAndTipoProveedor = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar proveedores."
+        };
+        let { razon_social, tipo_proveedor } = req.body;
+        console.log("razon_social:", razon_social);
+        if(!razon_social){
+            razon_social = null;
+        }
+        console.log("tipo_proveedor:", tipo_proveedor);
+        if(!tipo_proveedor){
+            tipo_proveedor = null;
+        }
+        const proveedorBean = new ProveedorBean(null, tipo_proveedor, null, null, razon_social, null, null, null, null, null, null, null, null);
+        const proveedorModelRes = await proveedorModel.searchByRazonSocialAndTipoProveedor(postgresConn, proveedorBean);
+        if(proveedorModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista = proveedorModelRes;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al buscar clientes por razon social y tipo de proveedor.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en proveedorService.searchByRazonSocialAndTipoProveedor,', error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = proveedorService;
