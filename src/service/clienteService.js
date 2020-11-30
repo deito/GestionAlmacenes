@@ -15,7 +15,7 @@ clienteService.getAll = async (req, res) => {
         if(clienteModelRes){
             response.resultado = 1;
             response.mensaje = "";
-            response.lista_clientes = clienteModelRes;
+            response.lista = clienteModelRes;
         }
         res.status(200).json(response);
     } catch (error) {
