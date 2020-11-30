@@ -71,4 +71,13 @@ clienteModel.searchByRazonSocialAndTipoCliente = async (conn, clienteBean) => {
     return queryResponse.rows;
 };
 
+clienteModel.updateEstadoById = async (conn, clienteBean) => {
+    const queryResponse = await conn.query("UPDATE rrn.tcliente SET estado=$1, modificado_por=$2, fecha_modificacion=$3 WHERE id_cliente=$4",
+    [clienteBean.estado, clienteBean.modificado_por, clienteBean.fecha_modificacion, clienteBean.id_cliente]);
+    if(queryResponse && queryResponse.rowCount > 0){
+        return true;
+    }
+    return false;
+};
+
 module.exports = clienteModel;

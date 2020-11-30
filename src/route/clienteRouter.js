@@ -17,4 +17,7 @@ router.post('/updateById', clienteService.updateById);
 // buscar por razon social y tipo de cliente
 router.post('/searchByRazonSocialAndTipoCliente',clienteService.searchByRazonSocialAndTipoCliente);
 
+// actualizar estado por id
+router.post('/updateEstadoById', clienteService.updateEstadoById);
+
 module.exports = router;

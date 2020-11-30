@@ -172,6 +172,49 @@ clienteService.searchByRazonSocialAndTipoCliente = async (req, res) => {
         console.log('Error en clienteService.searchByRazonSocialAndTipoCliente,', error);
         res.status(500).send(error);
     }
-}
+};
+
+clienteService.updateEstadoById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al actualizar el estado del cliente por id."
+        };
+        const { estado, id_cliente, modificado_por } = req.body;
+        if(!id_cliente || id_cliente == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo id_cliente no tiene un valor válido. Tipo de dato: '"+(typeof id_cliente)+"', valor = "+id_cliente;
+            res.status(200).json(response);
+            return;
+        }
+        if(!estado || estado == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo estado no tiene un valor válido. Tipo de dato: '"+(typeof estado)+"', valor = "+estado;
+            res.status(200).json(response);
+            return;
+        }
+        if(!modificado_por || modificado_por == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo modificado_por no tiene un valor válido. Tipo de dato: '"+(typeof modificado_por)+"', valor = "+modificado_por;
+            res.status(200).json(response);
+            return;
+        }
+        const fecha_modificacion = new Date();
+        const clienteBean = new ClienteBean(id_cliente, null, null, null, null, null, null, null, estado, null, null, modificado_por, fecha_modificacion);
+        const clienteModelRes = await clienteModel.updateEstadoById(postgresConn, clienteBean);
+        if(clienteModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.id = id_cliente;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al actualizar el estado del cliente por id.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en clienteService.updateEstadoById,', error);
+        res.status(500).send(error);
+    }
+};
 
 module.exports = clienteService;
