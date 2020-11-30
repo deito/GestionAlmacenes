@@ -14,7 +14,7 @@ productoService.getAll = async (req, res) => {
         if(productoModelRes){
             response.resultado = 1;
             response.mensaje = "";
-            response.lista_productos = productoModelRes;
+            response.lista = productoModelRes;
         }
         res.status(200).json(response);
     } catch (error) {
