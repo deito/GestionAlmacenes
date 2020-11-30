@@ -14,4 +14,7 @@ router.post('/updateById', productoService.updateById);
 // obtener producto por id
 router.get('/getById', productoService.getById);
 
+// buscar producto por codigo
+router.post('/searchByCodigo', productoService.searchByCodigo);
+
 module.exports = router;

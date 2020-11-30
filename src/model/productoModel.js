@@ -30,4 +30,9 @@ productoModel.getById = async (conn, id) => {
     return queryResponse.rows;
 };
 
+productoModel.searchByCodigo = async (conn, codigo) => {
+    const queryResponse = await conn.query("SELECT producto.* FROM rrn.tproducto producto WHERE UPPER(producto.codigo) like '%'||UPPER($1)||'%'",[codigo]);
+    return queryResponse.rows;
+};
+
 module.exports = productoModel;

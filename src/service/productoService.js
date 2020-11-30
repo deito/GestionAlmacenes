@@ -139,4 +139,27 @@ productoService.getById = async (req, res) => {
     }
 };
 
+productoService.searchByCodigo = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar productos por codigo."
+        };
+        const { codigo } = req.body;
+        const productoModelRes = await productoModel.searchByCodigo(postgresConn, codigo);
+        if(productoModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista = productoModelRes;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al buscar productos por codigo.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en productoService.searchByCodigo,', error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = productoService;
