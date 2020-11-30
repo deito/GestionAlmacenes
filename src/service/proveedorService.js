@@ -166,4 +166,47 @@ proveedorService.searchByRazonSocialAndTipoProveedor = async (req, res) => {
     }
 };
 
+proveedorService.updateEstadoById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al actualizar el estado del proveedor por id."
+        };
+        const { estado, id_proveedor, modificado_por } = req.body;
+        if(!id_proveedor || id_proveedor == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo id_proveedor no tiene un valor válido. Tipo de dato: '"+(typeof id_proveedor)+"', valor = "+id_proveedor;
+            res.status(200).json(response);
+            return;
+        }
+        if(!estado || estado == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo estado no tiene un valor válido. Tipo de dato: '"+(typeof estado)+"', valor = "+estado;
+            res.status(200).json(response);
+            return;
+        }
+        if(!modificado_por || modificado_por == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo modificado_por no tiene un valor válido. Tipo de dato: '"+(typeof modificado_por)+"', valor = "+modificado_por;
+            res.status(200).json(response);
+            return;
+        }
+        const fecha_modificacion = new Date();
+        const proveedorBean = new ProveedorBean(id_proveedor, null, null, null, null, null, null, null, estado, null, null, modificado_por, fecha_modificacion);
+        const proveedorModelRes = await proveedorModel.updateEstadoById(postgresConn, proveedorBean);
+        if(proveedorModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.id = id_proveedor;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al actualizar el estado del proveedor por id.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en proveedorService.updateEstadoById,', error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = proveedorService;

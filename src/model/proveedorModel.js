@@ -68,4 +68,13 @@ proveedorModel.searchByRazonSocialAndTipoProveedor = async (conn, proveedorBean)
     return queryResponse.rows;
 };
 
+proveedorModel.updateEstadoById = async (conn, proveedorBean) => {
+    const queryResponse = await conn.query("UPDATE rrn.tproveedor SET estado=$1, modificado_por=$2, fecha_modificacion=$3 WHERE id_proveedor=$4",
+    [proveedorBean.estado, proveedorBean.modificado_por, proveedorBean.fecha_modificacion, proveedorBean.id_proveedor]);
+    if(queryResponse && queryResponse.rowCount > 0){
+        return true;
+    }
+    return false;
+};
+
 module.exports = proveedorModel;

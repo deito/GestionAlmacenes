@@ -15,6 +15,9 @@ router.get('/getById', proveedorService.getById);
 router.post('/updateById', proveedorService.updateById);
 
 // buscar por razon social y tipo de proveedor
-router.post('/searchByRazonSocialAndTipoProveedor', proveedorService.searchByRazonSocialAndTipoProveedor)
+router.post('/searchByRazonSocialAndTipoProveedor', proveedorService.searchByRazonSocialAndTipoProveedor);
+
+// actualizar estado por id
+router.post('/updateEstadoById', proveedorService.updateEstadoById);
 
 module.exports = router;

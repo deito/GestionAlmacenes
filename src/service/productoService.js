@@ -166,7 +166,7 @@ productoService.updateEstadoById = async (req, res) => {
     try {
         const response = {
             resultado: 0,
-            mensaje: "Error inesperado al actualizar el estado del producto."
+            mensaje: "Error inesperado al actualizar el estado del producto por id."
         };
         const { estado, id_producto, modificado_por } = req.body;
         if(!id_producto || id_producto == constantes.emptyString){
@@ -194,6 +194,9 @@ productoService.updateEstadoById = async (req, res) => {
             response.resultado = 1;
             response.mensaje = "";
             response.id = id_producto;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al actualizar el estado del producto por id.";
         }
         res.status(200).json(response);
     } catch (error) {
