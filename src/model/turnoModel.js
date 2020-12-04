@@ -6,4 +6,10 @@ turnoModel.searchLastTurnoByIdUsuarioAndIdLocal = async (conn, id_usuario, id_lo
     return queryResponse.rows;
 };
 
+turnoModel.save = async (conn, turnoBean) => {
+    const queryResponse = await conn.query("INSERT INTO rrn.tturno (id_usuario, id_local, accion, fecha_inicio) VALUES($1, $2, $3, $4) RETURNING id_turno", 
+        [turnoBean.usuario.id_usuario, turnoBean.local.id_local, turnoBean.accion, turnoBean.fecha_inicio]);
+    return queryResponse.rows;
+};
+
 module.exports = turnoModel;
