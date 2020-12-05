@@ -8,4 +8,7 @@ router.post('/searchLastTurnoByIdUsuarioAndIdLocal', turnoService.searchLastTurn
 // Iniciar Turno
 router.post('/startTurno', turnoService.startTurno);
 
+// Terminar turno
+router.post('/endUpTurno', turnoService.endUpTurno);
+
 module.exports = router;

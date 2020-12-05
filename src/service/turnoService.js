@@ -85,4 +85,43 @@ turnoService.startTurno = async (req, res) => {
     }
 };
 
+turnoService.endUpTurno = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al terminar el Turno."
+        };
+        let { accion, id_turno } = req.body;
+        console.log('accion:', accion);
+        if(!accion || accion == constantes.emptyString){
+            response.resultado = 0;
+            response.mensaje = "El campo accion no tiene un valor válido. Tipo de dato: '"+(typeof accion)+"', valor = "+accion;
+            res.status(200).json(response);
+            return;
+        }
+        if(!id_turno){
+            response.resultado = 0;
+            response.mensaje = "El campo id_turno no tiene un valor válido. Tipo de dato: '"+(typeof id_turno)+"', valor = "+id_turno;
+            res.status(200).json(response);
+            return;
+        }
+        const turnoBean = new TurnoBean();
+        turnoBean.id_turno = id_turno;
+        turnoBean.accion = accion;
+        turnoBean.fecha_fin = new Date();
+        const turnoModelRes = await turnoModel.updateAccionAndFechaFinByIdTurno(postgresConn, turnoBean);
+        if(turnoModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+        } else {
+            response.resultado = 1;
+            response.mensaje = "Error al intentar actualizar el Turno.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en turnoService.endUpTurno,", error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = turnoService;

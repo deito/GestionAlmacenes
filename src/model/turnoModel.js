@@ -12,4 +12,13 @@ turnoModel.save = async (conn, turnoBean) => {
     return queryResponse.rows;
 };
 
+turnoModel.updateAccionAndFechaFinByIdTurno = async (conn, turnoBean) => {
+    const queryResponse = await conn.query("UPDATE rrn.tturno SET accion=$1, fecha_fin=$2 WHERE id_turno=$3", 
+        [turnoBean.accion, turnoBean.fecha_fin, turnoBean.id_turno]);
+    if(queryResponse && queryResponse.rowCount > 0){
+        return true;
+    }
+    return false;
+};
+
 module.exports = turnoModel;
