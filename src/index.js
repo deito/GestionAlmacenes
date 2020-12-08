@@ -19,6 +19,7 @@ app.use('/cliente', require('./route/clienteRouter'));
 app.use('/producto', require('./route/productoRouter'));
 app.use('/proveedor', require('./route/proveedorRouter'));
 app.use('/turno', require('./route/turnoRouter'));
+app.use('/almacen/ingresos', require('./route/ingresoRouter'));
 
 // Export the app instance
 module.exports = app;

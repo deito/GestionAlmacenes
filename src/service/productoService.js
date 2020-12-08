@@ -52,7 +52,7 @@ productoService.save = async (req, res) => {
             response.id = productoModelRes[0].id_producto;
         } else {
             response.resultado = 0;
-            response.mensaje = "Error al intentar guardar el producto."
+            response.mensaje = "Error al intentar guardar el producto.";
         }
         res.status(200).json(response);
     } catch (error) {

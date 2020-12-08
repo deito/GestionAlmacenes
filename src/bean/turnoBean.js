@@ -8,13 +8,5 @@ module.exports = class TurnoBean {
         this.fecha_inicio = obj.fecha_inicio;
         this.fecha_fin = obj.fecha_fin;
     }
-    /*
-    setIdTurno(idTurno){
-        this.id_turno = idTurno;
-    }
-
-    getIdTurno(){
-        return this.id_turno;
-    }
-    */
+    
 }
