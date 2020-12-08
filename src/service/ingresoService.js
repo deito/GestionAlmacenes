@@ -39,7 +39,7 @@ ingresoService.nuevoIngreso = async (req, res) => {
         ingresoBean.tipo_ingreso = ingreso.tipo_ingreso;
         ingresoBean.fecha_ingreso = ingreso.fecha_ingreso;
         ingresoBean.motivo = ingreso.motivo;
-        ingresoBean.id_cliente = ingreso.id_cliente;
+        ingresoBean.cliente = {id_cliente: ingreso.id_cliente };
         ingresoBean.descripcion = ingreso.descripcion;
         ingresoBean.usuario = { id_usuario: ingreso.id_usuario };
         ingresoBean.local = { id_local: ingreso.id_local };
