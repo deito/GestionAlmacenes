@@ -7,4 +7,14 @@ ingresoModel.save = async (conn, ingresoBean) => {
     return queryResponse.rows;
 };
 
+ingresoModel.searchByLimitAndOffset = async (conn, cantidad_filas, pagina) => {
+    const queryResponse = await conn.query("SELECT * FROM rrn.tingreso LIMIT $1 OFFSET $2",[cantidad_filas, cantidad_filas*pagina]);
+    return queryResponse.rows;
+};
+
+ingresoModel.countRows = async (conn) => {
+    const queryResponse = await conn.query("SELECT COUNT(*) as cantidad FROM rrn.tingreso", []);
+    return queryResponse.rows;
+};
+
 module.exports = ingresoModel;

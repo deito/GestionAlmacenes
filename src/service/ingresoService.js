@@ -17,7 +17,7 @@ ingresoService.nuevoIngreso = async (req, res) => {
         let { ingreso, ingreso_detalles } = req.body;
         if(!ingreso){
             response.resultado = 0;
-            response.mensaje = "El objeto ingreso no tiene un valor válido. Tipo de dato: '"+(typeof ingreso)+"', valor = "+ingreso;
+            response.mensaje = "El objeto ingreso no tiene un valor válido. Tipo de dato: '"+(typeof ingreso)+"', valor = "+JSON.stringify(ingreso);
             res.status(200).json(response);
             return;
         }
@@ -87,6 +87,52 @@ ingresoService.nuevoIngreso = async (req, res) => {
         res.status(500).send(error);
     } finally {
         client.release();
+    }
+};
+
+ingresoService.countRows = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al contar Ingresos."
+        };
+        const ingresoModelRes = await ingresoModel.countRows(postgresConn);
+        if(ingresoModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.cantidad = ingresoModelRes[0].cantidad;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al momento de contar Ingresos en la base de datos.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en ingresoService.countRows,', error);
+        res.status(500).send(error);
+    }
+};
+
+ingresoService.searchByPagination = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar Ingresos."
+        };
+        let { cantidad_filas, pagina } = req.body;
+        pagina = pagina - 1;
+        const ingresoModelRes = await ingresoModel.searchByLimitAndOffset(postgresConn, cantidad_filas, pagina);
+        if(ingresoModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista = ingresoModelRes;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al momento de buscar Ingresos en la base de datos.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log('Error en ingresoService.searchByLimitAndOffset,', error);
+        res.status(500).send(error);
     }
 };
 
