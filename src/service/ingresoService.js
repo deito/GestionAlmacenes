@@ -69,8 +69,12 @@ ingresoService.nuevoIngreso = async (req, res) => {
                 response.mensaje = "";
                 response.id = ingresoModelRes[0].id_ingreso;
             } else {
+                console.log("Error al intentar guardar el producto.");
+                await client.query("ROLLBACK");
                 response.resultado = 0;
-                response.mensaje = "Error al intentar guardar el producto.";
+                response.mensaje = "Error al intentar guardar el producto.";                
+                res.status(200).json(response);
+                return;
             }
             await client.query('COMMIT')
             res.status(200).json(response);
