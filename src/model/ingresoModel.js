@@ -8,14 +8,23 @@ ingresoModel.save = async (conn, ingresoBean) => {
 };
 
 ingresoModel.searchByLimitAndOffset = async (conn, cantidad_filas, pagina) => {
-    const queryResponse = await conn.query("SELECT ingreso.*, usu.usuario, cliente.razon_social FROM rrn.tingreso ingreso join rrn.tusuario usu on usu.id_usuario=ingreso.id_usuario"
-    +" join rrn.tcliente cliente on cliente.id_cliente=ingreso.id_cliente ORDER BY ingreso.id_ingreso"
+    const queryResponse = await conn.query("SELECT ingreso.*, usu.usuario, cliente.razon_social, local.nombre as nombre_local"
+    +" FROM rrn.tingreso ingreso join rrn.tusuario usu on usu.id_usuario=ingreso.id_usuario"
+    +" join rrn.tcliente cliente on cliente.id_cliente=ingreso.id_cliente join rrn.tlocal local on local.id_local=ingreso.id_local ORDER BY ingreso.id_ingreso"
     +" LIMIT $1 OFFSET $2",[cantidad_filas, cantidad_filas*pagina]);
     return queryResponse.rows;
 };
 
 ingresoModel.countRows = async (conn) => {
     const queryResponse = await conn.query("SELECT COUNT(*) as cantidad FROM rrn.tingreso", []);
+    return queryResponse.rows;
+};
+
+ingresoModel.getById = async (conn, id) => {
+    const queryResponse = await conn.query("SELECT ingreso.*, usu.usuario, cliente.razon_social, local.nombre as nombre_local"
+    +" FROM rrn.tingreso ingreso join rrn.tusuario usu on usu.id_usuario=ingreso.id_usuario"
+    +" join rrn.tcliente cliente on cliente.id_cliente=ingreso.id_cliente join rrn.tlocal local on local.id_local=ingreso.id_local WHERE ingreso.id_ingreso=$1",
+    [id]);
     return queryResponse.rows;
 };
 

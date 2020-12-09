@@ -11,4 +11,7 @@ router.get('/countRows', ingresoService.countRows);
 // buscar por paginacion: cantidad de filas y pagina
 router.post('/searchByPagination', ingresoService.searchByPagination);
 
+// obtener por id
+router.get('/getById', ingresoService.getById);
+
 module.exports = router;

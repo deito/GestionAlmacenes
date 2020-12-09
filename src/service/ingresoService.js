@@ -136,4 +136,45 @@ ingresoService.searchByPagination = async (req, res) => {
     }
 };
 
+ingresoService.getById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar Ingreso por id."
+        };
+        const { id } = req.query;
+        if(!id){
+            response.resultado = 0;
+            response.mensaje = "El campo id no tiene un valor válido. id = "+id;
+        }
+        const ingresoModelRes = await ingresoModel.getById(postgresConn, id);
+        console.log("ingresoModelRes[0].id_ingreso:", ingresoModelRes[0].id_ingreso);
+        if(ingresoModelRes){
+            if (ingresoModelRes.length > 0) {
+                const ingresoDetalleModelRes = await ingresoDetalleModel.getByIdIngreso(postgresConn, ingresoModelRes[0].id_ingreso);
+                if(ingresoDetalleModelRes){
+                    response.resultado = 1;
+                    response.mensaje = "";
+                    response.objeto = ingresoModelRes[0];
+                    response.lista = ingresoDetalleModelRes;
+                } else {
+                    response.resultado = 0;
+                    response.mensaje = "Error al momento de obtener los detalles del Ingreso.";
+                }                
+            } else {
+                response.resultado = 1;
+                response.mensaje = "";
+                response.objeto = {};
+            }
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al momento de obtener el Ingreso.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en ingresoService.getById,", error);
+        res.status(500).send(error);
+    }
+};
+
 module.exports = ingresoService;
