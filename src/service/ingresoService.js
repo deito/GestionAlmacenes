@@ -177,4 +177,164 @@ ingresoService.getById = async (req, res) => {
     }
 };
 
+ingresoService.update = async (req, res) => {
+    const client = await postgresConn.getClient();
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al actualizar el Ingreso."
+        };
+        let { ingreso, ingreso_detalles } = req.body;
+        if(!ingreso){
+            response.resultado = 0;
+            response.mensaje = "El objeto ingreso no tiene un valor válido. Tipo de dato: '"+(typeof ingreso)+"', valor = "+JSON.stringify(ingreso);
+            res.status(200).json(response);
+            return;
+        }
+        if(!ingreso.id_ingreso){
+            response.resultado = 0;
+            response.mensaje = "El campo id_ingreso no tiene un valor válido. Tipo de dato: '"+(typeof id_ingreso)+"', valor = "+id_ingreso;
+            res.status(200).json(response);
+            return;
+        }
+        if(!ingreso_detalles || ingreso_detalles.length < 1){
+            response.resultado = 0;
+            response.mensaje = "El array ingreso_detalles no tiene un valor válido o no tiene por lo menos 1 elemento. Tipo de dato: '"+(typeof ingreso_detalles)+"', valor = "+JSON.stringify(ingreso_detalles);
+            res.status(200).json(response);
+            return;
+        }
+
+        if(!utility.validateStringDateYYYYMMDD(ingreso.fecha_ingreso)){
+            response.resultado = 0;
+            response.mensaje = "El campo fecha_ingreso no tiene un valor válido. Tipo de dato: '"+(typeof ingreso.fecha_ingreso)+"', valor = "+ingreso.fecha_ingreso;
+            res.status(200).json(response);
+            return;
+        }
+
+        const ingresoBean = new IngresoBean();
+        ingresoBean.id_ingreso = ingreso.id_ingreso;
+        ingresoBean.tipo_ingreso = ingreso.tipo_ingreso;
+        ingresoBean.fecha_ingreso = ingreso.fecha_ingreso;
+        ingresoBean.motivo = ingreso.motivo;
+        ingresoBean.cliente = {id_cliente: ingreso.id_cliente };
+        ingresoBean.descripcion = ingreso.descripcion;
+        ingresoBean.usuario = { id_usuario: ingreso.id_usuario };
+        ingresoBean.local = { id_local: ingreso.id_local };
+        ingresoBean.modificado_por = ingreso.modificado_por;
+        ingresoBean.fecha_modificacion = new Date();
+
+        const ingresoDetalleModelActualRes = await ingresoDetalleModel.getOnlyThisTableByIdIngreso(postgresConn, ingresoBean.id_ingreso);
+        console.log("ingresoDetalleModelActualRes:", ingresoDetalleModelActualRes);
+        if(ingresoDetalleModelActualRes){
+            /*
+            if(ingresoDetalleModelActualRes.length > 0){
+                if(ingresoDetalleModelActualRes.length != ingreso_detalles.length){
+
+                } else {
+                    for(let i=0;i < ingresoDetalleModelActualRes.length;i++){
+                        for(let j=0;j < ingreso_detalles.length;j++){
+                            if(ingresoDetalleModelActualRes[i].id_ingreso_detalle==ingreso_detalles.id_ingreso_detalle){
+
+                            }
+                        }
+                    }
+                }
+            } else {
+                response.resultado = 0;
+                response.mensaje = "Error, no hay Detalles de Ingreso en la base de datos para el id_ingreso = "+ingreso.id_ingreso;
+                res.status(200).json(response);
+                return;
+            }
+            */
+            if(ingresoDetalleModelActualRes.length > 0){
+                await client.query("BEGIN");
+                // Actualizamos Ingreso
+                const ingresoModelRes = await ingresoModel.updateById(client, ingresoBean);
+                if(!ingresoModelRes){
+                    // Si la actualizacion de Ingreso fallo
+                    console.log("Error, no se pudo actualizar el Ingreso en la base de datos con el id_ingreso =", ingreso.id_ingreso);
+                    await client.query("ROLLBACK");
+                    response.resultado = 0;
+                    response.mensaje = "Error, no se pudo borrar el Detalle de Ingreso en la base de datos con el id_ingreso_detalle = "+ingresoDetalleModelActualRes[i].id_ingreso_detalle;
+                    res.status(200).json(response);
+                    return;
+                }
+
+                // borrando detalle_ingreso actuales
+                const seBorro = await ingresoDetalleModel.deleteByIdIngreso(client, ingreso.id_ingreso);
+                if(!seBorro){
+                    //throw new Error("Error, no se pudo borrar el Detalle de Ingreso en la base de datos con el id_ingreso_detalle = "+ingresoDetalleModelActualRes[i].id_ingreso_detalle);
+                    console.log("Error, no se pudo borrar el Detalle de Ingreso en la base de datos con el id_ingreso =", ingreso.id_ingreso);
+                    await client.query("ROLLBACK");
+                    response.resultado = 0;
+                    response.mensaje = "Error, no se pudo borrar el Detalle de Ingreso en la base de datos con el id_ingreso = "+ingreso.id_ingreso;
+                    res.status(200).json(response);
+                    return;
+                }
+                /*
+                for(let i=0;i < ingresoDetalleModelActualRes.length;i++){
+                    const seBorro = await ingresoDetalleModel.deleteById(client, ingresoDetalleModelActualRes[i].id_ingreso_detalle);
+                    if(!seBorro){
+                        //throw new Error("Error, no se pudo borrar el Detalle de Ingreso en la base de datos con el id_ingreso_detalle = "+ingresoDetalleModelActualRes[i].id_ingreso_detalle);
+                        console.log("Error, no se pudo borrar el Detalle de Ingreso en la base de datos con el id_ingreso_detalle =", ingresoDetalleModelActualRes[i].id_ingreso_detalle);
+                        await client.query("ROLLBACK");
+                        response.resultado = 0;
+                        response.mensaje = "Error, no se pudo borrar el Detalle de Ingreso en la base de datos con el id_ingreso_detalle = "+ingresoDetalleModelActualRes[i].id_ingreso_detalle;
+                        res.status(200).json(response);
+                        return;
+                    }
+                }
+                */
+                // insertando nuevos detalles
+                const ids_ingreso_detalle = [];
+                for(let i=0;i < ingreso_detalles.length;i++){
+                    const ingresoDetalleBean = new IngresoDetalleBean();
+                    ingresoDetalleBean.ingreso = { id_ingreso: ingreso.id_ingreso };
+                    ingresoDetalleBean.producto = { id_producto: ingreso_detalles[i].id_producto };
+                    ingresoDetalleBean.cantidad = ingreso_detalles[i].cantidad;
+                    const ingresoDetalleModelRes = await ingresoDetalleModel.save(client, ingresoDetalleBean);
+                    if(ingresoDetalleModelRes && ingresoDetalleModelRes[0].id_ingreso_detalle){
+                        ids_ingreso_detalle.push(ingresoDetalleModelRes[0].id_ingreso_detalle);
+                    } else {
+                        //throw new Error('Error al intentar insertar tingreso_detalle: '+ingresoDetalleModelRes);
+                        console.log("Error al intentar insertar tingreso_detalle:", ingresoDetalleModelRes);
+                        await client.query("ROLLBACK");
+                        response.resultado = 0;
+                        response.mensaje = "Error al intentar insertar tingreso_detalle";
+                        res.status(200).json(response);
+                        return;
+                    }
+                }
+                console.log("ids_ingreso_detalle:", ids_ingreso_detalle);
+                if(ids_ingreso_detalle.length > 0){
+                    response.resultado = 1;
+                    response.mensaje = "";
+                    response.id = ingreso.id_ingreso;
+                } else {
+                    response.resultado = 0;
+                    response.mensaje = "Error al intentar guardar el producto.";
+                }
+                await client.query('COMMIT');
+                res.status(200).json(response);
+            } else {
+                response.resultado = 0;
+                response.mensaje = "Error, no hay Detalles de Ingreso en la base de datos para el id_ingreso = "+ingreso.id_ingreso;
+                res.status(200).json(response);
+                return;
+            }    
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al momento de buscar detalles de Ingreso.";
+            res.status(200).json(response);
+            return;
+        }
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.log("Error en ingresoService.updateById,", error);
+        res.status(500).send(error);
+    } finally {
+        client.release();
+    }
+};
+
 module.exports = ingresoService;

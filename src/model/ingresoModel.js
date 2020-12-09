@@ -28,4 +28,20 @@ ingresoModel.getById = async (conn, id) => {
     return queryResponse.rows;
 };
 
+ingresoModel.updateById = async (conn, ingresoBean) => {
+    try {
+        const queryResponse = await conn.query("UPDATE rrn.tingreso SET tipo_ingreso=$1, fecha_ingreso=to_timestamp($2,'YYYY-MM-DD'), motivo=$3, id_cliente=$4, descripcion=$5,"
+        +" id_usuario=$6, id_local=$7, modificado_por=$8, fecha_modificacion=$9 WHERE id_ingreso=$10", 
+        [ingresoBean.tipo_ingreso, ingresoBean.fecha_ingreso, ingresoBean.motivo, ingresoBean.cliente.id_cliente, ingresoBean.descripcion,
+        ingresoBean.usuario.id_usuario, ingresoBean.local.id_local, ingresoBean.modificado_por, ingresoBean.fecha_modificacion, ingresoBean.id_ingreso]);
+        if(queryResponse && queryResponse.rowCount > 0){
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.log("Error en ingresoModel.updateById,", error);
+        throw error;
+    }
+};
+
 module.exports = ingresoModel;

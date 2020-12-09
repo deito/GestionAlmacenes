@@ -7,12 +7,12 @@ utility.addHoursToDate = (hoursParam, dateParam) => {
 
 utility.validateStringDateYYYYMMDD = (stringDate) => {
     const fecha = new Date(stringDate);
-    console.log("stringDate:", stringDate);
-    console.log("fecha:", fecha);
-    console.log("constantes.minDate:", constantes.minDate);
-    console.log("constantes.maxDate:", constantes.maxDate);
-    console.log("fecha > constantes.minDate:", fecha > constantes.minDate);
-    console.log("fecha < constantes.maxDate:", fecha < constantes.maxDate);
+    //console.log("stringDate:", stringDate);
+    //console.log("fecha:", fecha);
+    //console.log("constantes.minDate:", constantes.minDate);
+    //console.log("constantes.maxDate:", constantes.maxDate);
+    //console.log("fecha > constantes.minDate:", fecha > constantes.minDate);
+    //console.log("fecha < constantes.maxDate:", fecha < constantes.maxDate);
     return fecha > constantes.minDate && fecha < constantes.maxDate;
 };
 

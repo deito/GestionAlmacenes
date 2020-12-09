@@ -14,4 +14,7 @@ router.post('/searchByPagination', ingresoService.searchByPagination);
 // obtener por id
 router.get('/getById', ingresoService.getById);
 
+// actualizar Ingreso por id y sus detalles
+router.post('/update', ingresoService.update);
+
 module.exports = router;

@@ -17,10 +17,20 @@ const pool = new Pool({
     password: config.postgres.password,
     host: config.postgres.host,
     port: config.postgres.port,
-    database: config.postgres.database,    
+    database: config.postgres.database,
+
+    // maximum number of clients the pool should contain
+    // by default this is set to 10.
     max: 20,
-    idleTimeoutMillis: 0,
-    connectionTimeoutMillis: 0,
+
+    // number of milliseconds a client must sit idle in the pool and not be checked out
+    // before it is disconnected from the backend and discarded
+    // default is 10000 (10 seconds) - set to 0 to disable auto-disconnection of idle clients
+    idleTimeoutMillis: 60000*15,
+
+    // number of milliseconds to wait before timing out when connecting a new client
+    // by default this is 0 which means no timeout
+    connectionTimeoutMillis: 6000,
   });
 
 module.exports = {
