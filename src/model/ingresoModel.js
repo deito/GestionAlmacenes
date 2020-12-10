@@ -1,3 +1,6 @@
+const constantes = require("../util/constantes");
+const utility = require('../util/utility');
+
 const ingresoModel = {};
 
 ingresoModel.save = async (conn, ingresoBean) => {
@@ -40,6 +43,106 @@ ingresoModel.updateById = async (conn, ingresoBean) => {
         return false;
     } catch (error) {
         console.log("Error en ingresoModel.updateById,", error);
+        throw error;
+    }
+};
+
+ingresoModel.countRowsByTipoIngresoAndRangoFecha = async (conn, tipo_ingreso, fecha_inicio, fecha_fin) => {
+    try {
+        let queryFinal = "SELECT COUNT(*) as cantidad FROM rrn.tingreso ingreso";
+        let whereCondition = "";
+        let queryParameters = [];
+        let parameterNames = [];
+        if(tipo_ingreso && tipo_ingreso != constantes.emptyString){
+            parameterNames.push("tipo_ingreso");
+        }
+        if(fecha_inicio && utility.validateStringDateYYYYMMDD(fecha_inicio)){
+            parameterNames.push("fecha_inicio");
+        }
+        if(fecha_fin && utility.validateStringDateYYYYMMDD(fecha_fin)){
+            parameterNames.push("fecha_fin");
+        }
+
+        if(parameterNames.length > 0){
+            whereCondition = " WHERE";
+        }
+        let i=0;
+        for(;i < parameterNames.length;){
+            if(i > 0){
+                whereCondition = whereCondition + " AND"
+            }
+            if(parameterNames[i] == "tipo_ingreso"){
+                whereCondition = whereCondition + " UPPER(ingreso.tipo_ingreso) LIKE '%'||UPPER($"+(i+1)+")||'%'";
+                queryParameters.push(tipo_ingreso);
+            }
+            if(parameterNames[i] == "fecha_inicio"){
+                whereCondition = whereCondition + " ingreso.fecha_ingreso>=TO_TIMESTAMP($"+(i+1)+",'YYYY-MM-DD')";
+                queryParameters.push(fecha_inicio);
+            }
+            if(parameterNames[i] == "fecha_fin"){
+                whereCondition = whereCondition + " ingreso.fecha_ingreso<=TO_TIMESTAMP($"+(i+1)+",'YYYY-MM-DD')";
+                queryParameters.push(fecha_fin);
+            }
+            i = i + 1;
+        }
+        queryFinal = queryFinal + whereCondition;
+        //console.log("queryFinal:", queryFinal);
+        const queryResponse = await conn.query(queryFinal, queryParameters);
+        return queryResponse.rows;
+    } catch (error) {
+        console.log("Error en ingresoModel.countRowsByTipoIngresoAndRangoFecha,", error);
+        throw error;
+    }
+};
+
+ingresoModel.searchByTipoIngresoAndRangoFechaAndLimitAndOffset = async (conn, tipo_ingreso, fecha_inicio, fecha_fin, cantidad_filas, pagina) => {
+    try {
+        let queryFinal = "SELECT ingreso.* , usu.usuario, cliente.razon_social, local.nombre as nombre_local FROM rrn.tingreso ingreso"
+        +" join rrn.tusuario usu on usu.id_usuario=ingreso.id_usuario"
+        +" join rrn.tcliente cliente on cliente.id_cliente=ingreso.id_cliente join rrn.tlocal local on local.id_local=ingreso.id_local";
+        let whereCondition = "";
+        let queryParameters = [];
+        let parameterNames = [];
+        if(tipo_ingreso && tipo_ingreso != constantes.emptyString){
+            parameterNames.push("tipo_ingreso");
+        }
+        if(fecha_inicio && utility.validateStringDateYYYYMMDD(fecha_inicio)){
+            parameterNames.push("fecha_inicio");
+        }
+        if(fecha_fin && utility.validateStringDateYYYYMMDD(fecha_fin)){
+            parameterNames.push("fecha_fin");
+        }
+
+        if(parameterNames.length > 0){
+            whereCondition = " WHERE";
+        }
+        let i=0;
+        for(;i < parameterNames.length;){
+            if(i > 0){
+                whereCondition = whereCondition + " AND"
+            }
+            if(parameterNames[i] == "tipo_ingreso"){
+                whereCondition = whereCondition + " UPPER(ingreso.tipo_ingreso) LIKE '%'||UPPER($"+(i+1)+")||'%'";
+                queryParameters.push(tipo_ingreso);
+            }
+            if(parameterNames[i] == "fecha_inicio"){
+                whereCondition = whereCondition + " ingreso.fecha_ingreso>=TO_TIMESTAMP($"+(i+1)+",'YYYY-MM-DD')";
+                queryParameters.push(fecha_inicio);
+            }
+            if(parameterNames[i] == "fecha_fin"){
+                whereCondition = whereCondition + " ingreso.fecha_ingreso<=TO_TIMESTAMP($"+(i+1)+",'YYYY-MM-DD')";
+                queryParameters.push(fecha_fin);
+            }
+            i = i + 1;
+        }
+        queryFinal = queryFinal + whereCondition+" ORDER BY ingreso.id_ingreso LIMIT $"+(i+1)+" OFFSET $"+(i+2);
+        queryParameters.push(cantidad_filas);
+        queryParameters.push(cantidad_filas*pagina);
+        //console.log("queryFinal:", queryFinal);
+        const queryResponse = await conn.query(queryFinal, queryParameters);
+        return queryResponse.rows;
+    } catch (error) {
+        console.log("Error en ingresoModel.searchByTipoIngresoAndRangoFechaAndLimitAndOffset,", error);
         throw error;
     }
 };

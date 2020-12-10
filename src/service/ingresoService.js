@@ -123,6 +123,18 @@ ingresoService.searchByPagination = async (req, res) => {
             mensaje: "Error inesperado al buscar Ingresos."
         };
         let { cantidad_filas, pagina } = req.body;
+        if(!cantidad_filas || cantidad_filas < 1){
+            response.resultado = 0,
+            response.mensaje = "Error, la cantidad de filas no es valida. cantidad_filas = "+cantidad_filas;
+            res.status(200).json(response);
+            return;
+        }
+        if(!pagina || pagina < 1){
+            response.resultado = 0,
+            response.mensaje = "Error, el valor de la pagina no es valida. pagina = "+pagina;
+            res.status(200).json(response);
+            return;
+        }
         pagina = pagina - 1;
         const ingresoModelRes = await ingresoModel.searchByLimitAndOffset(postgresConn, cantidad_filas, pagina);
         if(ingresoModelRes){
@@ -338,6 +350,77 @@ ingresoService.update = async (req, res) => {
         res.status(500).send(error);
     } finally {
         client.release();
+    }
+};
+
+ingresoService.countRowsByTipoIngresoAndRangoFecha = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al contar Ingresos."
+        };
+        let { tipo_ingreso, fecha_inicio, fecha_fin } = req.body;
+        const ingresoModelRes = await ingresoModel.countRowsByTipoIngresoAndRangoFecha(postgresConn, 
+            tipo_ingreso, fecha_inicio, fecha_fin);
+        if(ingresoModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.cantidad = ingresoModelRes[0].cantidad;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al momento de contar Ingresos en la base de datos.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en ingresoService.countRowsByTipoIngresoAndRangoFecha,", error);
+        res.status(500).send(error);
+    }
+}
+
+ingresoService.searchByTipoIngresoAndRangoFechaAndPagination = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar Ingresos."
+        };
+        let { tipo_ingreso, fecha_inicio, fecha_fin, cantidad_filas, pagina } = req.body;
+        console.log("tipo_ingreso:", tipo_ingreso);
+        if(!tipo_ingreso || tipo_ingreso == constantes.emptyString){
+            tipo_ingreso = null;
+        }
+        if(!fecha_inicio || fecha_inicio == constantes.emptyString){
+            fecha_inicio = null;
+        }
+        if(!fecha_fin || fecha_fin == constantes.emptyString){
+            fecha_fin = null;
+        }
+        if(!cantidad_filas || cantidad_filas < 1){
+            response.resultado = 0,
+            response.mensaje = "Error, la cantidad de filas no es valida. cantidad_filas = "+cantidad_filas;
+            res.status(200).json(response);
+            return;
+        }
+        if(!pagina || pagina < 1){
+            response.resultado = 0,
+            response.mensaje = "Error, el valor de la pagina no es valida. pagina = "+pagina;
+            res.status(200).json(response);
+            return;
+        }
+        pagina = pagina - 1;
+        const ingresoModelRes = await ingresoModel.searchByTipoIngresoAndRangoFechaAndLimitAndOffset(postgresConn, 
+            tipo_ingreso, fecha_inicio, fecha_fin, cantidad_filas, pagina);
+        if(ingresoModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista = ingresoModelRes;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al momento de buscar Ingresos en la base de datos.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en ingresoService.searchByTipoIngresoAndRangoFechaAndPagination,", error);
+        res.status(500).send(error);
     }
 };
 

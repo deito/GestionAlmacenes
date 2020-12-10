@@ -6,6 +6,7 @@ utility.addHoursToDate = (hoursParam, dateParam) => {
 };
 
 utility.validateStringDateYYYYMMDD = (stringDate) => {
+    // stringDate: YYYY-MM_DD
     const fecha = new Date(stringDate);
     //console.log("stringDate:", stringDate);
     //console.log("fecha:", fecha);

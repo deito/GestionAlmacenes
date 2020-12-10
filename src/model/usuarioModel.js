@@ -201,7 +201,7 @@ usuarioModel.searchByUsuarioAndIdRol = async (conn, usuarioBean) => {
     for(let i=0;i < parameterNames.length;){    
         if(i > 0){
             whereCondition = whereCondition + " AND"
-        }  
+        }
         console.log("parameterNames["+i+"]: "+parameterNames[i]);
         if(parameterNames[i] == "usuario"){
             whereCondition = whereCondition + " UPPER(usu.usuario) like '%'||UPPER($"+(i+1)+")||'%'";
