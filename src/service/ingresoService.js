@@ -50,9 +50,10 @@ ingresoService.nuevoIngreso = async (req, res) => {
         ingresoBean.fecha_registro = new Date();
 
         await client.query("BEGIN");
+        // guardar cabecera de Ingreso
         const ingresoModelRes = await ingresoModel.save(client, ingresoBean);
-        if(ingresoModelRes && ingresoModelRes[0].id_ingreso){
-            console.log("ingresoModelRes[0].id_ingreso:", ingresoModelRes[0].id_ingreso);
+        console.log("ingresoModelRes[0].id_ingreso:", ingresoModelRes[0].id_ingreso);
+        if(ingresoModelRes && ingresoModelRes[0].id_ingreso){            
             const ids_ingreso_detalle = [];
             const ingresoDetalleBeanList = [];
             for(let i=0;i < ingreso_detalles.length; i++){
@@ -60,6 +61,7 @@ ingresoService.nuevoIngreso = async (req, res) => {
                 ingresoDetalleBean.ingreso = { id_ingreso: ingresoModelRes[0].id_ingreso };
                 ingresoDetalleBean.producto = { id_producto: ingreso_detalles[i].id_producto };
                 ingresoDetalleBean.cantidad = ingreso_detalles[i].cantidad;
+                // Guardar detalle de Ingreso
                 const ingresoDetalleModelRes = await ingresoDetalleModel.save(client, ingresoDetalleBean);
                 if(ingresoDetalleModelRes && ingresoDetalleModelRes[0].id_ingreso_detalle){
                     ids_ingreso_detalle.push(ingresoDetalleModelRes[0].id_ingreso_detalle);
@@ -81,7 +83,8 @@ ingresoService.nuevoIngreso = async (req, res) => {
                 const productoEnStock = await stockModel.getByIdProductoAndIdLocal(client, ingresoDetalleBeanList[j].producto.id_producto, ingreso.id_local);
                 if(productoEnStock.length > 0){
                     // ya existe el producto y local en el stock
-                    console.log("ya existe el producto y local en el stock. id_producto: "+ingresoDetalleBeanList[j].producto.id_producto+", id_local:"+ingreso.id_local);
+                    console.log("ya existe el producto y local en el stock. id_stock: "+productoEnStock[0].id_stock
+                    +", id_producto: "+ingresoDetalleBeanList[j].producto.id_producto+", id_local:"+ingreso.id_local);
                     let cantidadParametro = new bigDecimal(ingresoDetalleBeanList[j].cantidad);
                     let cantidadAnterior = new bigDecimal(productoEnStock[0].cantidad);
                     let suma = cantidadAnterior.add(cantidadParametro);
@@ -125,10 +128,10 @@ ingresoService.nuevoIngreso = async (req, res) => {
                 response.mensaje = "";
                 response.id = ingresoModelRes[0].id_ingreso;
             } else {
-                console.log("Error al intentar guardar el producto.");
+                console.log("Error al intentar guardar los detalles de Ingreso.");
                 await client.query("ROLLBACK");
                 response.resultado = 0;
-                response.mensaje = "Error al intentar guardar el producto.";                
+                response.mensaje = "Error al intentar los detalles de Ingreso.";                
                 res.status(200).json(response);
                 return;
             }

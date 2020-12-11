@@ -1,5 +1,6 @@
 module.exports = class SalidaBean {
     constructor(obj){
+        obj = obj || {};
         this.id_salida = obj.id_salida;
         this.tipo_salida = obj.tipo_salida;
         this.fecha_salida = obj.fecha_salida;
