@@ -1,8 +1,11 @@
+const bigDecimal = require('js-big-decimal');
 const ingresoModel = require('../model/ingresoModel');
 const ingresoDetalleModel = require('../model/ingresoDetalleModel');
+const stockModel = require('../model/stockModel');
 const postgresConn = require('../db/postgres');
 const IngresoBean = require('../bean/ingresoBean');
 const IngresoDetalleBean = require('../bean/ingresoDetalleBean');
+const StockBean = require('../bean/stockBean');
 const constantes = require('../util/constantes');
 const utility = require('../util/utility');
 const ingresoService = {};
@@ -51,6 +54,7 @@ ingresoService.nuevoIngreso = async (req, res) => {
         if(ingresoModelRes && ingresoModelRes[0].id_ingreso){
             console.log("ingresoModelRes[0].id_ingreso:", ingresoModelRes[0].id_ingreso);
             const ids_ingreso_detalle = [];
+            const ingresoDetalleBeanList = [];
             for(let i=0;i < ingreso_detalles.length; i++){
                 const ingresoDetalleBean = new IngresoDetalleBean();
                 ingresoDetalleBean.ingreso = { id_ingreso: ingresoModelRes[0].id_ingreso };
@@ -59,11 +63,63 @@ ingresoService.nuevoIngreso = async (req, res) => {
                 const ingresoDetalleModelRes = await ingresoDetalleModel.save(client, ingresoDetalleBean);
                 if(ingresoDetalleModelRes && ingresoDetalleModelRes[0].id_ingreso_detalle){
                     ids_ingreso_detalle.push(ingresoDetalleModelRes[0].id_ingreso_detalle);
+                    ingresoDetalleBean.id_ingreso_detalle = ingresoDetalleModelRes[0].id_ingreso_detalle;
+                    ingresoDetalleBeanList.push(ingresoDetalleBean);
                 } else {
-                    throw new Error('Error al intentar insertar tingreso_detalle: '+ingresoDetalleModelRes);
+                    //throw new Error('Error al intentar insertar tingreso_detalle: '+ingresoDetalleModelRes);
+                    console.log("Error al intentar insertar tingreso_detalle:", ingresoDetalleModelRes);
+                    await client.query("ROLLBACK");
+                    response.resultado = 0;
+                    response.mensaje = "Error al insertar tingreso_detalle. "+JSON.stringify(ingresoDetalleModelRes);                
+                    res.status(200).json(response);
+                    return;
                 }
             }
             console.log("ids_ingreso_detalle:", ids_ingreso_detalle);
+            // actualizar stock
+            for(let j=0;j < ingresoDetalleBeanList.length; j++){
+                const productoEnStock = await stockModel.getByIdProductoAndIdLocal(client, ingresoDetalleBeanList[j].producto.id_producto, ingreso.id_local);
+                if(productoEnStock.length > 0){
+                    // ya existe el producto y local en el stock
+                    console.log("ya existe el producto y local en el stock. id_producto: "+ingresoDetalleBeanList[j].producto.id_producto+", id_local:"+ingreso.id_local);
+                    let cantidadParametro = new bigDecimal(ingresoDetalleBeanList[j].cantidad);
+                    let cantidadAnterior = new bigDecimal(productoEnStock[0].cantidad);
+                    let suma = cantidadAnterior.add(cantidadParametro);
+                    const stockBean = new StockBean();
+                    stockBean.id_stock = productoEnStock[0].id_stock;
+                    stockBean.cantidad = suma.getValue();
+                    const stockModelRes = await stockModel.updateCantidadById(client, stockBean);
+                    if(!stockModelRes){
+                        console.log("Error al intentar actualizar el stock. id_stock: "+stockBean.id_stock+", nueva cantidad: "+suma.getValue());
+                        await client.query("ROLLBACK");
+                        response.resultado = 0;
+                        response.mensaje = "Error al intentar actualizar el stock.";                
+                        res.status(200).json(response);
+                        return;
+                    }
+                } else {
+                    // el producto no existe en el stock
+                    console.log("el producto no existe en el stock");
+                    console.log("ingresoDetalleBeanList["+j+"].cantidad:", ingresoDetalleBeanList[j].cantidad);
+                    console.log("ingresoDetalleBeanList["+j+"].producto.id_producto:", ingresoDetalleBeanList[j].producto.id_producto);
+                    console.log("ingreso.id_local:", ingreso.id_local);
+                    let cantidadParametro = new bigDecimal(ingresoDetalleBeanList[j].cantidad);
+                    const stockBean = new StockBean();
+                    stockBean.cantidad = cantidadParametro.getValue();
+                    stockBean.producto = { id_producto: ingresoDetalleBeanList[j].producto.id_producto };
+                    stockBean.local = { id_local: ingreso.id_local };
+                    const stockModelRes = await stockModel.save(client, stockBean);
+                    if(!stockModelRes){
+                        console.log("Error al intentar guardar el stock. id_producto: "+stockBean.producto.id_producto+", id_local:"+ingreso.id_local+", nueva cantidad: "+cantidadParametro.getValue());
+                        await client.query("ROLLBACK");
+                        response.resultado = 0;
+                        response.mensaje = "Error al intentar actualizar el stock.";                
+                        res.status(200).json(response);
+                        return;
+                    }
+                }
+            }
+            
             if(ids_ingreso_detalle.length > 0){
                 response.resultado = 1;
                 response.mensaje = "";
@@ -79,6 +135,8 @@ ingresoService.nuevoIngreso = async (req, res) => {
             await client.query('COMMIT')
             res.status(200).json(response);
         } else {
+            console.log("Error al intentar guardar el nuevo Ingreso.");
+            await client.query("ROLLBACK");
             response.resultado = 0;
             response.mensaje = "Error al intentar guardar el nuevo Ingreso."
             res.status(200).json(response);
