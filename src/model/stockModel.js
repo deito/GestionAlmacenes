@@ -2,7 +2,10 @@ const stockModel = {};
 
 stockModel.getAll = async (conn) => {
     try {
-        const queryResponse = await conn.query("SELECT stock.* FROM rrn.tstock stock",[]);
+        const queryResponse = await conn.query("SELECT stock.*, producto.codigo as producto_codigo, producto.nombre as producto_nombre,"
+        +" local.nombre as local_nombre FROM rrn.tstock stock"
+        +" join rrn.tproducto producto on producto.id_producto=stock.id_producto"
+        +" join rrn.tlocal local on local.id_local=stock.id_local",[]);
         return queryResponse.rows;
     } catch (error) {
         console.log("Error en stockModel.getAll,", error);
