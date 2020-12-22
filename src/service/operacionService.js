@@ -264,7 +264,7 @@ operacionService.save = async (req, res) => {
             return;
         }
 
-        if(!utility.validateStringDateYYYYMMDD(operacion.fecha_operacion)){
+        if(!operacion.fecha_operacion || operacion.fecha_operacion==constantes.emptyString || !utility.validateStringDateYYYYMMDD(operacion.fecha_operacion)){
             response.resultado = 0;
             response.mensaje = "El campo fecha_operacion no tiene un valor válido. Tipo de dato: '"+(typeof operacion.fecha_operacion)+"', valor = "+operacion.fecha_operacion;
             res.status(200).json(response);
@@ -315,6 +315,45 @@ operacionService.save = async (req, res) => {
     }
 };
 
-
+operacionService.countRowsByFilters = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al contar Ingresos."
+        };
+        let { id_tipo_operacion, id_tipo_documento, id_cliente, fecha_inicio, fecha_fin } = req.body;
+        // Inicio: Validando filtros
+        if(!fecha_inicio || fecha_inicio==constantes.emptyString || !utility.validateStringDateYYYYMMDD(fecha_inicio)){
+            const mensaje = "El campo fecha_inicio no tiene un valor válido. Tipo de dato: '"+(typeof fecha_inicio)+"', valor = "+fecha_inicio;
+            console.log(mensaje);
+            response.resultado = 0;
+            response.mensaje = mensaje;
+            res.status(200).json(response);
+            return;
+        }
+        if(!fecha_fin || fecha_fin==constantes.emptyString || !utility.validateStringDateYYYYMMDD(fecha_fin)){
+            const mensaje = "El campo fecha_fin no tiene un valor válido. Tipo de dato: '"+(typeof fecha_fin)+"', valor = "+fecha_fin;
+            console.log(mensaje);
+            response.resultado = 0;
+            response.mensaje = mensaje;
+            res.status(200).json(response);
+            return;
+        }
+        // Fin: Validando filtros
+        const operacionModelRes = await operacionModel.countRowsByFilters(postgresConn, req.body);
+        if(operacionModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.cantidad = operacionModelRes[0].cantidad;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al momento de contar Operaciones en la base de datos.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en operacionService.countRowsByFilters,", error);
+        res.status(500).send(error);
+    }
+};
 
 module.exports = operacionService;

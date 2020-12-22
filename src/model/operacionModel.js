@@ -16,4 +16,62 @@ operacionModel.save = async (conn, operacionBean) => {
     }
 };
 
+operacionModel.countRowsByFilters = async (conn, filtros) => {
+    try {
+        let queryFinal = "SELECT COUNT(*) as cantidad FROM rrn.toperacion operacion";
+        let whereCondition = "";
+        let queryParameters = [];
+        let parameterNames = [];
+        if(filtros.id_tipo_operacion){
+            parameterNames.push("id_tipo_operacion");
+        }
+        if(filtros.id_tipo_documento){
+            parameterNames.push("id_tipo_documento");
+        }
+        if(filtros.id_cliente){
+            parameterNames.push("id_cliente");
+        }
+        if(filtros.fecha_inicio){
+            parameterNames.push("fecha_inicio");
+        }
+        if(filtros.fecha_fin){
+            parameterNames.push("fecha_fin");
+        }
+        
+        if(parameterNames.length > 0){
+            whereCondition = " WHERE";
+        }
+
+        let i=0;
+        for(;i < parameterNames.length;){
+            if(i > 0){
+                whereCondition = whereCondition + " AND"
+            }
+            if(parameterNames[i] == "id_tipo_operacion"){
+                whereCondition = whereCondition + " operacion.id_tipo_operacion=$"+(i+1);
+                queryParameters.push(filtros.id_tipo_operacion);
+            } else if(parameterNames[i] == "id_tipo_documento"){
+                whereCondition = whereCondition + " operacion.id_tipo_documento=$"+(i+1);
+                queryParameters.push(filtros.id_tipo_documento);
+            } else if(parameterNames[i] == "id_cliente"){
+                whereCondition = whereCondition + " operacion.id_cliente=$"+(i+1);
+                queryParameters.push(filtros.id_cliente);
+            } else if(parameterNames[i] == "fecha_inicio"){
+                whereCondition = whereCondition + " operacion.fecha_operacion>=TO_TIMESTAMP($"+(i+1)+",'YYYY-MM-DD')";
+                queryParameters.push(filtros.fecha_inicio);
+            } else if(parameterNames[i] == "fecha_fin"){
+                whereCondition = whereCondition + " operacion.fecha_operacion<=TO_TIMESTAMP($"+(i+1)+",'YYYY-MM-DD')";
+                queryParameters.push(filtros.fecha_fin);
+            }
+            i = i + 1;
+        }
+        queryFinal = queryFinal + whereCondition;
+        const queryResponse = await conn.query(queryFinal, queryParameters);
+        return queryResponse.rows;
+    } catch (error) {
+        console.log("Error en operacionModel.countRowsByFilters,", error);
+        throw error;
+    }
+};
+
 module.exports = operacionModel;
