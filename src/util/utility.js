@@ -1,3 +1,4 @@
+const bigDecimal = require('js-big-decimal');
 const constantes = require('../util/constantes');
 const utility = {};
 
@@ -15,6 +16,16 @@ utility.validateStringDateYYYYMMDD = (stringDate) => {
     //console.log("fecha > constantes.minDate:", fecha > constantes.minDate);
     //console.log("fecha < constantes.maxDate:", fecha < constantes.maxDate);
     return fecha > constantes.minDate && fecha < constantes.maxDate;
+};
+
+utility.isNumericValue = (paramValue) => {
+    try {
+        const bdVar = new bigDecimal(paramValue);
+        return true;
+    } catch (error) {
+        console.log("Error en utility.isNumericValue,", error);
+        return false;
+    }
 };
 
 module.exports = utility;

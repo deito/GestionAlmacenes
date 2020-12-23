@@ -11,4 +11,7 @@ router.post('/save', operacionService.save);
 // contar filas con filtro
 router.post('/countRowsByFilters', operacionService.countRowsByFilters);
 
+// buscar por filtros
+router.post('/searchByFilters', operacionService.searchByFilters);
+
 module.exports = router;
