@@ -79,11 +79,12 @@ movimientoModel.searchByFilters = async (conn, filtros) => {
     try {
         let queryFinal;
         let selectQuery = "SELECT movimiento.*, tipo_operacion.id_tipo_operacion, tipo_operacion.nombre as tipo_operacion_nombre"
-        +", tipo_movimiento.nombre as tipo_movimiento_nombre, local.nombre as local_nombre";
+        +", tipo_movimiento.nombre as tipo_movimiento_nombre, local.nombre as local_nombre, usuario.usuario";
         let fromQuery = " FROM rrn.tmovimiento movimiento JOIN rrn.toperacion operacion ON operacion.id_operacion=movimiento.id_operacion"
         +" JOIN rrn.ttipo_operacion tipo_operacion ON tipo_operacion.id_tipo_operacion=operacion.id_tipo_operacion"
         +" JOIN rrn.ttipo_movimiento tipo_movimiento ON tipo_movimiento.id_tipo_movimiento=movimiento.id_tipo_movimiento"
-        +" JOIN rrn.tlocal local ON local.id_local=movimiento.id_local";
+        +" JOIN rrn.tlocal local ON local.id_local=movimiento.id_local"
+        +" JOIN rrn.tusuario usuario ON usuario.id_usuario=operacion.id_usuario";
         let whereCondition = "";
         let queryParameters = [];
         let parameterNames = [];
