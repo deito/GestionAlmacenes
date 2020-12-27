@@ -1,8 +1,11 @@
 const router = require('express').Router();
 
-const operacionService = require('../service/movimientoService');
+const movimientoService = require('../service/movimientoService');
 
 // contar filas con filtro
-router.post('/countRowsByFilters', operacionService.countRowsByFilters);
+router.post('/countRowsByFilters', movimientoService.countRowsByFilters);
+
+// buscar por filtros
+router.post('/searchByFilters', movimientoService.searchByFilters);
 
 module.exports = router;
