@@ -102,7 +102,7 @@ async function saveDevolucionCliente(client, operacion, detalles_operacion, deta
                 for(let i=0;i < detalles_operacion.length; i++){
                     const detalleMovimientoBean = new DetalleMovimientoBean();
                     detalleMovimientoBean.movimiento = { id_movimiento: movimientoModelRes[0].id_movimiento };
-                    detalleMovimientoBean.producto = detalles_operacion[i].id_producto;
+                    detalleMovimientoBean.producto = { id_producto: detalles_operacion[i].id_producto};
                     detalleMovimientoBean.cantidad = detalles_operacion[i].cantidad;
                     // Guardar detalle de Movimiento
                     const detalleMovimientoModelRes = await detalleMovimientoModel.save(client, detalleMovimientoBean);

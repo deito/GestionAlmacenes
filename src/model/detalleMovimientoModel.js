@@ -11,4 +11,15 @@ detalleMovimientoModel.save = async (conn, detalleMovimientBean) => {
     }
 };
 
+detalleMovimientoModel.getByIdMovimiento = async (conn, id_movimiento) => {
+    try {
+        const queryResponse = await conn.query("SELECT det_mov.*, producto.codigo as producto_codigo, producto.nombre as producto_nombre FROM rrn.tdetalle_movimiento det_mov"
+        +" JOIN rrn.tproducto producto on producto.id_producto=det_mov.id_producto WHERE det_mov.id_movimiento=$1", [id_movimiento]);
+        return queryResponse.rows;
+    } catch (error) {
+        console.log("Error en detalleMovimientoModel.getByIdMovimiento,", error);
+        throw error;
+    }
+};
+
 module.exports = detalleMovimientoModel;

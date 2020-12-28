@@ -4,6 +4,7 @@ const movimientoModel = require('../model/movimientoModel');
 const postgresConn = require('../db/postgres');
 const constantes = require('../util/constantes');
 const utility = require('../util/utility');
+const detalleMovimientoModel = require('../model/detalleMovimientoModel');
 
 const movimientoService = {};
 
@@ -128,6 +129,34 @@ movimientoService.searchByFilters = async (req, res) => {
         res.status(200).json(response);
     } catch (error) {
         console.log("Error en movimientoService.searchByFilters,", error);
+        res.status(500).send(error);
+    }
+};
+
+movimientoService.getDetalleMovimientoById = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar el Detalle de Movimiento por id."
+        };
+        const { id } = req.query;
+        console.log("");
+        if(!utility.isNumericValue(id) || bigDecimal.compareTo(id, "0") < 1){
+            response.resultado = 0;
+            response.mensaje = "El campo id no tiene un valor válido. id = "+id;
+        }
+        const detalleMovimientoModelRes = await detalleMovimientoModel.getByIdMovimiento(postgresConn, id);
+        if(detalleMovimientoModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista = detalleMovimientoModelRes;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al momento de obtener Movimientos de la BD.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en movimientoService.getDetalleMovimientoById,", error);
         res.status(500).send(error);
     }
 };

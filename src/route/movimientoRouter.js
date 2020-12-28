@@ -8,4 +8,7 @@ router.post('/countRowsByFilters', movimientoService.countRowsByFilters);
 // buscar por filtros
 router.post('/searchByFilters', movimientoService.searchByFilters);
 
+// buscar detalles de movimiento
+router.get('/getDetalleMovimientoById', movimientoService.getDetalleMovimientoById);
+
 module.exports = router;

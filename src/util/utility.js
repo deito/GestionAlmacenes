@@ -3,7 +3,8 @@ const constantes = require('../util/constantes');
 const utility = {};
 
 utility.addHoursToDate = (hoursParam, dateParam) => {
-    return new Date(dateParam.getTime() + (hoursParam*60*60*1000));
+    // 60*60*1000 = 3600000
+    return new Date(dateParam.getTime() + (hoursParam*3600000));
 };
 
 utility.validateStringDateYYYYMMDD = (stringDate) => {
