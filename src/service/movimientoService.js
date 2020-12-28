@@ -140,8 +140,7 @@ movimientoService.getDetalleMovimientoById = async (req, res) => {
             mensaje: "Error inesperado al buscar el Detalle de Movimiento por id."
         };
         const { id } = req.query;
-        console.log("");
-        if(!utility.isNumericValue(id) || bigDecimal.compareTo(id, "0") < 1){
+        if(id && (!utility.isNumericValue(id) || bigDecimal.compareTo(id, "0") < 1)){
             response.resultado = 0;
             response.mensaje = "El campo id no tiene un valor válido. id = "+id;
         }
@@ -157,6 +156,39 @@ movimientoService.getDetalleMovimientoById = async (req, res) => {
         res.status(200).json(response);
     } catch (error) {
         console.log("Error en movimientoService.getDetalleMovimientoById,", error);
+        res.status(500).send(error);
+    }
+};
+
+movimientoService.getDetalleMovimientoByFilters = async (req, res) => {
+    try {
+        const response = {
+            resultado: 0,
+            mensaje: "Error inesperado al buscar el Detalle de Movimiento por filtros."
+        };
+        const { id_local, id_producto } = req.query;
+        // Si es un valor valido(es decir no es null, NaN ni undefined) y,
+        // Si no es un numero, o si es menor o igual a CERO
+        if(id_local && (!utility.isNumericValue(id_local) || bigDecimal.compareTo(id_local, "0") < 1)){
+            response.resultado = 0;
+            response.mensaje = "El campo id_local no tiene un valor válido. id = "+id_local;
+        }
+        if(id_producto && (!utility.isNumericValue(id_producto) || bigDecimal.compareTo(id_producto, "0") < 1)){
+            response.resultado = 0;
+            response.mensaje = "El campo id_producto no tiene un valor válido. id = "+id_producto;
+        }
+        const detalleMovimientoModelRes = await detalleMovimientoModel.getByIdLocalAndIdProducto(postgresConn, req.query);
+        if(detalleMovimientoModelRes){
+            response.resultado = 1;
+            response.mensaje = "";
+            response.lista = detalleMovimientoModelRes;
+        } else {
+            response.resultado = 0;
+            response.mensaje = "Error al momento de obtener Detalle de Movimientos de la BD.";
+        }
+        res.status(200).json(response);
+    } catch (error) {
+        console.log("Error en movimientoService.getDetalleMovimientoByIdLocalAndIdProducto,", error);
         res.status(500).send(error);
     }
 };
