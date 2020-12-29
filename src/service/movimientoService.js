@@ -1,4 +1,3 @@
-const { request } = require('express');
 const bigDecimal = require('js-big-decimal');
 const movimientoModel = require('../model/movimientoModel');
 const postgresConn = require('../db/postgres');

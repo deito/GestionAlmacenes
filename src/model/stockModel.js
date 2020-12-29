@@ -49,4 +49,46 @@ stockModel.updateCantidadById = async (conn, stockBean) => {
     }
 };
 
+stockModel.countRowsByFilters = async (conn, filtros) => {
+    try {
+        let queryFinal;
+        let selectQuery = "SELECT COUNT(*) as cantidad";
+        let fromQuery = " FROM rrn.tstock stock"
+        let whereCondition = "";
+        let queryParameters = [];
+        let parameterNames = [];
+        if(filtros.id_local){
+            parameterNames.push("id_local");
+        }
+        if(filtros.id_producto){
+            parameterNames.push("id_producto");
+        }
+
+        if(parameterNames.length > 0){
+            whereCondition = " WHERE";
+        }
+
+        let i=0;
+        for(;i < parameterNames.length;){
+            if(i > 0){
+                whereCondition = whereCondition + " AND"
+            }
+            if(parameterNames[i] == "id_local"){
+                whereCondition = whereCondition + " stock.id_local=$"+(i+1);
+                queryParameters.push(filtros.id_local);
+            } else if(parameterNames[i] == "id_producto"){
+                whereCondition = whereCondition + " stock.id_producto=$"+(i+1);
+                queryParameters.push(filtros.id_producto);
+            }
+            i = i + 1;
+        }
+        queryFinal = selectQuery + fromQuery + whereCondition;
+        const queryResponse = await conn.query(queryFinal, queryParameters);
+        return queryResponse.rows;
+    } catch (error) {
+        console.log("Error en stockModel.countRowsByFilters,", error);
+        throw error;
+    }
+};
+
 module.exports = stockModel;
