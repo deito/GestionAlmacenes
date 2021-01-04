@@ -14,7 +14,7 @@ types.setTypeParser(1114, function(stringValue) {
 
 const pool = new Pool({
     user: config.postgres.user,
-    password: config.postgres.password,
+    password: process.env.PGPASSWORD || config.postgres.password,
     host: config.postgres.host,
     port: config.postgres.port,
     database: config.postgres.database,
