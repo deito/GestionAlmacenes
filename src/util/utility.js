@@ -29,4 +29,42 @@ utility.isNumericValue = (paramValue) => {
     }
 };
 
+/* Es 'paramValue' un valor de numero entero?
+* @Params: paramValue
+*/
+utility.isWholeNumberValue = (paramValue) => {
+    try {
+        const bdValue = new bigDecimal(paramValue);
+        const bdCeilValue = new bigDecimal(paramValue).ceil();
+        console.log("bdValue:", bdValue.getValue());
+        console.log("bdCeilValue:", bdCeilValue.getValue());
+        if(bdCeilValue.compareTo(bdValue) == 0){
+            console.log("Sí se un valor entero");
+            return true;
+        } else {
+            console.log("No es un valor entero");
+            return false;
+        }
+        
+    } catch (error) {
+        console.log("Error en utility.isWholeNumberValue,", error);
+        return false;
+    }
+};
+
+utility.isLessThanOne = (paramValue) => {
+    try {
+        const bdValue = new bigDecimal(paramValue);
+        const bdUno = new bigDecimal("1");
+        if(bdUno.compareTo(bdValue) > 0){ // Si bdUno.compareTo(bdValue) = 1, entonces paramValue es menor que 1
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log("Error en utility.isWholeNumberValue,", error);
+        return false;
+    }
+};
+
 module.exports = utility;

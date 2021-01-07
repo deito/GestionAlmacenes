@@ -31,12 +31,12 @@ async function saveDevolucionCliente(client, operacion, detalles_operacion, deta
             return response;
         }
         */
-        if(!operacion.id_cliente){
+        if(!utility.isWholeNumberValue(operacion.id_cliente) || utility.isLessThanOne(operacion.id_cliente)){
             response.resultado = 0;
             response.mensaje = "El campo id_cliente no tiene un valor válido. Tipo de dato: '"+(typeof operacion.id_cliente)+"', valor = "+operacion.id_cliente;
             return response;
         }
-        if(!operacion.id_local){
+        if(!utility.isWholeNumberValue(operacion.id_local) || utility.isLessThanOne(operacion.id_local)){
             response.resultado = 0;
             response.mensaje = "El campo id_local no tiene un valor válido. Tipo de dato: '"+(typeof operacion.id_local)+"', valor = "+operacion.id_local;
             return response;
@@ -201,6 +201,155 @@ async function saveDevolucionCliente(client, operacion, detalles_operacion, deta
     }
 }
 
+async function saveDevolucionProveedor(client, operacion, detalles_operacion, detalleOperacionBeanList, operacionBean, response){
+    try {
+        if(!utility.isWholeNumberValue(operacion.id_proveedor) || utility.isLessThanOne(operacion.id_proveedor)){
+            response.resultado = 0;
+            response.mensaje = "El campo id_cliente no tiene un valor válido. Tipo de dato: '"+(typeof operacion.id_cliente)+"', valor = "+operacion.id_cliente;
+            return response;
+        }
+        if(!utility.isWholeNumberValue(operacion.id_local) || utility.isLessThanOne(operacion.id_local)){
+            response.resultado = 0;
+            response.mensaje = "El campo id_local no tiene un valor válido. Tipo de dato: '"+(typeof operacion.id_local)+"', valor = "+operacion.id_local;
+            return response;
+        }
+
+        await client.query("BEGIN");
+        // Inicio: Actualizar Stock
+        for(let j=0;j < detalles_operacion.length; j++){
+            const productoEnStock = await stockModel.getByIdProductoAndIdLocal(client, detalles_operacion[j].id_producto, operacion.id_local);
+            if(productoEnStock.length > 0){
+                // ya existe el producto y local en el stock
+                console.log("ya existe el producto y local en el stock. id_stock: "+productoEnStock[0].id_stock
+                +", id_producto: "+detalles_operacion[j].id_producto+", id_local:"+operacion.id_local);
+                let cantidadParametro = new bigDecimal(detalles_operacion[j].cantidad);
+                let cantidadAnterior = new bigDecimal(productoEnStock[0].cantidad);
+                let nuevaCantidad = cantidadAnterior.subtract(cantidadParametro);
+                const stockBean = new StockBean();
+                stockBean.id_stock = productoEnStock[0].id_stock;
+                stockBean.cantidad = nuevaCantidad.getValue();
+                const stockModelRes = await stockModel.updateCantidadById(client, stockBean);
+                if(!stockModelRes){
+                    let mensaje = "Error al intentar actualizar el stock. id_stock: "+stockBean.id_stock+", nueva cantidad: "+nuevaCantidad.getValue();
+                    await client.query("ROLLBACK");
+                    response.resultado = 0;
+                    response.mensaje = mensaje;
+                    return response;
+                }
+            } else {
+                // el producto no existe en el stock
+                console.log("el producto no existe en el stock");
+                console.log("detalles_operacion["+j+"].cantidad:", detalles_operacion[j].cantidad);
+                console.log("detalles_operacion["+j+"].producto.id_producto:", detalles_operacion[j].id_producto);
+                console.log("operacion.id_local:", operacion.id_local);                                
+                let mensaje = "Error al intentar actualizar el stock. El producto no existe en el stock. id_producto: "
+                +detalles_operacion[j].id_producto+", id_local:"+operacion.id_local+", nueva cantidad: "+detalles_operacion[j].cantidad;
+                console.log(mensaje);
+                await client.query("ROLLBACK");
+                response.resultado = 0;
+                response.mensaje = mensaje;
+                return response;
+                
+            }
+        }
+        // Fin: Actualizar Stock
+
+        // guardar cabecera de Operacion
+        const operacionModelRes = await operacionModel.save(client, operacionBean);
+        console.log("operacionModelRes[0].id_operacion:", operacionModelRes[0].id_operacion);
+        if(operacionModelRes && operacionModelRes[0].id_operacion){
+            for(let i=0;i < detalles_operacion.length; i++){
+                const detalleOperacionBean = new DetalleOperacionBean();
+                detalleOperacionBean.operacion = { id_operacion: operacionModelRes[0].id_operacion };
+                detalleOperacionBean.producto = { id_producto: detalles_operacion[i].id_producto };
+                detalleOperacionBean.cantidad = detalles_operacion[i].cantidad;
+                // Guardar detalle de Operacion
+                const detalleOperacionModelRes = await detalleOperacionModel.save(client, detalleOperacionBean);
+                if(detalleOperacionModelRes && detalleOperacionModelRes[0].id_detalle_operacion){
+                    //ids_detalle_operacion.push(detalleOperacionModelRes[0].id_detalle_operacion);
+                    detalleOperacionBean.id_detalle_operacion = detalleOperacionModelRes[0].id_detalle_operacion;
+                    detalleOperacionBeanList.push(detalleOperacionBean);
+                } else {
+                    let mensaje = "Error al intentar insertar tdetalle_operacion:"+JSON.stringify(detalleOperacionModelRes)
+                    console.log(mensaje);
+                    await client.query("ROLLBACK");
+                    response.resultado = 0;
+                    response.mensaje = mensaje;
+                    return response;
+                }
+            }
+            console.log("detalleOperacionBeanList.length: "+detalleOperacionBeanList.length);
+
+            //// Inicio: Guardar Movimiento
+            const movimientoBean = new MovimientoBean();
+            movimientoBean.tipo_movimiento = { id_tipo_movimiento: 2 };// 2 = SALIDA
+            movimientoBean.fecha_movimieto = operacion.fecha_operacion;
+            movimientoBean.operacion = { id_operacion: operacionModelRes[0].id_operacion };
+            movimientoBean.local = { id_local: operacion.id_local };
+            movimientoBean.registrado_por = operacion.id_usuario;
+
+            // Guardar cabecera de Movimiento
+            const movimientoModelRes = await movimientoModel.save(client, movimientoBean);
+            console.log("movimientoModelRes[0].id_movimiento:", movimientoModelRes[0].id_movimiento);
+            if(movimientoModelRes && movimientoModelRes[0].id_movimiento){
+                for(let i=0;i < detalles_operacion.length; i++){
+                    const detalleMovimientoBean = new DetalleMovimientoBean();
+                    detalleMovimientoBean.movimiento = { id_movimiento: movimientoModelRes[0].id_movimiento };
+                    detalleMovimientoBean.producto = { id_producto: detalles_operacion[i].id_producto};
+                    detalleMovimientoBean.cantidad = detalles_operacion[i].cantidad;
+                    // Guardar detalle de Movimiento
+                    const detalleMovimientoModelRes = await detalleMovimientoModel.save(client, detalleMovimientoBean);
+                    if(!detalleMovimientoModelRes || !detalleMovimientoModelRes[0].id_detalle_movimiento){
+                        let mensaje = "Error al intentar insertar tdetalle_operacion:"+JSON.stringify(detalleOperacionModelRes)
+                        console.log(mensaje);
+                        await client.query("ROLLBACK");
+                        response.resultado = 0;
+                        response.mensaje = mensaje;
+                        return response;
+                    }
+                }
+            } else {
+                let mensaje = "Error al intentar guardar el movimiento."
+                console.log(mensaje);
+                await client.query("ROLLBACK");
+                response.resultado = 0;
+                response.mensaje = mensaje;
+                return response;
+            }
+            //// Fin: Guardar Movimiento
+
+            
+            console.log("Todo bien?");
+            console.log(detalleOperacionBeanList.length)
+            if(detalleOperacionBeanList.length > 0){
+                console.log("Todo bien.");
+                response.resultado = 1;
+                response.mensaje = "";
+                response.id = operacionModelRes[0].id_operacion;
+                await client.query('COMMIT');
+                return response;
+            } else {
+                let mensaje = "Error al intentar guardar los detalles de Devolucion de Proveedor.";
+                await client.query("ROLLBACK");
+                response.resultado = 0;
+                response.mensaje = mensaje;
+                return response;
+            }
+            
+        } else {
+            let mensaje = "Error al intentar guardar la Devolución de Proveedor."
+            console.log(mensaje);
+            await client.query("ROLLBACK");
+            response.resultado = 0;
+            response.mensaje = mensaje;
+            return response;
+        }
+    } catch (error) {
+        console.log("Error en operacionService => saveDevolucionProveedor,", error);
+        throw error;
+    }
+}
+
 operacionService.getAllTipoOperacion = async (req, res) => {
     try {
         const response = {
@@ -231,13 +380,13 @@ operacionService.save = async (req, res) => {
             mensaje: "Error inesperado al guardar la nueva Operacion."
         };
         let { operacion, detalles_operacion } = req.body;
-        if(!operacion.id_tipo_operacion){
+        if(!utility.isWholeNumberValue(operacion.id_tipo_operacion) || utility.isLessThanOne(operacion.id_tipo_operacion)){
             response.resultado = 0;
             response.mensaje = "El campo id_tipo_operacion no tiene un valor válido. Tipo de dato: '"+(typeof operacion.id_tipo_operacion)+"', valor = "+operacion.id_tipo_operacion;
             res.status(200).json(response);
             return;
         }
-        if(!operacion.id_usuario){
+        if(!utility.isWholeNumberValue(operacion.id_usuario) || utility.isLessThanOne(operacion.id_usuario)){
             response.resultado = 0;
             response.mensaje = "El campo id_usuario no tiene un valor válido. Tipo de dato: '"+(typeof operacion.id_usuario)+"', valor = "+operacion.id_usuario;
             res.status(200).json(response);
@@ -300,6 +449,11 @@ operacionService.save = async (req, res) => {
             if(seGuardo) {                
                 response = seGuardo;
             }
+        } else if(operacion.id_tipo_operacion == 5){
+            // operacion.id_tipo_operacion == 5: DEVOLUCION DE CLIENTE
+            seGuardo = await saveDevolucionProveedor(client, operacion, detalles_operacion, detalleOperacionBeanList, operacionBean, response);
+            console.log("seGuardo:", seGuardo);
+            console.log("response:", response);
         } else {
             response.resultado = 0;
             response.mensaje = "El id_tipo_operacion = "+operacion.id_tipo_operacion+" no tiene un servicio disponible.";

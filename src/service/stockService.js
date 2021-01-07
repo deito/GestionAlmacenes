@@ -93,7 +93,7 @@ stockService.searchByFilters = async (req, res) => {
             res.status(200).json(response);
             return;
         }
-        if(!utility.isNumericValue(cantidad_filas) || cantidad_filas < 1){
+        if(!utility.isWholeNumberValue(cantidad_filas) || cantidad_filas < 1){
             const mensaje = "El campo cantidad_filas no tiene un valor válido. Tipo de dato: '"+(typeof cantidad_filas)+"', valor = "+cantidad_filas;
             console.log(mensaje);
             response.resultado = 0;
@@ -101,7 +101,7 @@ stockService.searchByFilters = async (req, res) => {
             res.status(200).json(response);
             return;
         }
-        if(!utility.isNumericValue(pagina) || pagina < 1){
+        if(!utility.isWholeNumberValue(pagina) || pagina < 1){
             const mensaje = "El campo pagina no tiene un valor válido. Tipo de dato: '"+(typeof pagina)+"', valor = "+pagina;
             console.log(mensaje);
             response.resultado = 0;
