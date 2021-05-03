@@ -5,6 +5,9 @@ const operacionService = require('../service/operacionService');
 // obtener los Tipos de Operacion
 router.get('/getAllTipoOperacion', operacionService.getAllTipoOperacion);
 
+// POST obtener los Tipos de Operacion
+router.post('/getAllTipoOperacion', operacionService.getAllTipoOperacion);
+
 // guardar nueva operacion
 router.post('/save', operacionService.save);
 

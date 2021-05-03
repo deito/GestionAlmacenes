@@ -356,6 +356,7 @@ operacionService.getAllTipoOperacion = async (req, res) => {
             resultado: 0,
             mensaje: "Error inesperado al buscar Tipos de Operacion."
         };
+        console.log("req.body: ", req.body);
         const tipoOperacionModelRes = await tipoOperacionModel.getAll(postgresConn);
         if(tipoOperacionModelRes){
             response.resultado = 1;
